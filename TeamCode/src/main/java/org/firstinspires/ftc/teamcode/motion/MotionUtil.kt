@@ -12,3 +12,17 @@ fun wrapAngle(angle: Double): Double {
     }
     return result
 }
+
+fun minPower(power: Double, min: Double): Double {
+    return if (power in 0.0..min) {
+        min
+    } else if (power < 0 && power > -min) {
+        -min
+    } else {
+        power
+    }
+}
+
+fun toRadians(degrees: Double): Double {
+    return degrees * PI / 180
+}
