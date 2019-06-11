@@ -6,13 +6,12 @@ import org.firstinspires.ftc.teamcode.motion.Line
 import org.firstinspires.ftc.teamcode.motion.Point
 
 
-class DebugApplicationServer {
-    val udpServer: UdpServer
+object DebugApplicationServer {
+    val udpServer = UdpServer(12835)
     var messageBuilder = StringBuilder()
     val df = DecimalFormat()
 
-    init {
-        udpServer = UdpServer(12835)
+    fun start() {
         udpServer.active = true
         val runner = Thread(udpServer)
         runner.start()
@@ -89,5 +88,9 @@ class DebugApplicationServer {
 
         udpServer.addMessage(messageBuilder.toString())
         messageBuilder = StringBuilder()
+    }
+
+    fun clearLogPoints() {
+        udpServer.splitAndSend("CLEARLOG,%")
     }
 }

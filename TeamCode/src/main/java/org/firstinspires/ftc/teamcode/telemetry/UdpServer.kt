@@ -8,7 +8,7 @@ import java.net.InetAddress
 import java.util.concurrent.Semaphore
 
 class UdpServer(val clientPort: Int) : Runnable {
-    var active = true
+    var active = false
     val sendLock = Semaphore(1)
     var lastSendMillis = 0L
     var currentUpdate = ""
@@ -39,7 +39,7 @@ class UdpServer(val clientPort: Int) : Runnable {
         }
     }
 
-    private fun splitAndSend(message: String) {
+    fun splitAndSend(message: String) {
         var startIndex = 0
         var endIndex: Int
 

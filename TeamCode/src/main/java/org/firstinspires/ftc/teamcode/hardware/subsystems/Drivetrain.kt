@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.util.Range
 import org.firstinspires.ftc.teamcode.hardware.devices.OptimizedMotor
 import org.firstinspires.ftc.teamcode.motion.*
+import org.firstinspires.ftc.teamcode.telemetry.DebugApplicationServer
 import org.openftc.revextensions2.ExpansionHubMotor
 import kotlin.math.*
 
@@ -88,7 +89,7 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
 
         val absoluteAngleToTarget = atan2(targetYAdj - yCurr, targetXAdj - xCurr)
         //
-        val relativeAngleToTarget = wrapAngle(absoluteAngleToTarget - (currAngle - PI / 2.0))
+        val relativeAngleToTarget = wrapAngle(absoluteAngleToTarget - (currAngle - toRadians(90.0)))
 
         val distanceToTarget = hypot(targetXAdj - xCurr, targetYAdj - yCurr)
 
@@ -114,19 +115,18 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
 
         // adjusted for what side of the robot we want pointed at the target (90 deg or pi/2 rad is
         // the front)
-        val actualFollowAngle = followAngle - PI / 2.0
+        val actualFollowAngle = followAngle - toRadians(90.0)
         // absolute angle to the target point, not adjusted for slip
-        val rawAbsoluteAngleToPoint = hypot(target.x - xCurr, target.y - yCurr)
+        val rawAbsoluteAngleToTarget = hypot(target.x - xCurr, target.y - yCurr)
         // what absolute angle we should be pointing towards
-        val absoluteFollowAngle = actualFollowAngle + rawAbsoluteAngleToPoint
+        val absoluteFollowAngle = actualFollowAngle + rawAbsoluteAngleToTarget
 
         // how far away we are from the absolute angle we need to point to
         val relativeFollowAngle = wrapAngle(absoluteFollowAngle - currAngle)
 
         val adjRelativeFollowAngle = wrapAngle(relativeFollowAngle - currentTurnSlip)
 
-        val decelerationAngle = toRadians(40.0)
-        val turnSpeed = (adjRelativeFollowAngle / decelerationAngle) * target.turnPower
+        val turnSpeed = (adjRelativeFollowAngle / toRadians(30.0)) * target.turnPower
 
         turnPower = Range.clip(turnSpeed, -target.turnPower, target.turnPower)
 
@@ -145,11 +145,8 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
         // only slow down if we are actually turning
         if (abs(turnPower) > 0.0001) {
             // slow down our movement if our current following angle is too far off
-            val turnErrorMovementScaleDown = Range.clip(
-                1.0 - abs(
-                    relativeFollowAngle /
-                            target.slowDownAngle
-                ), 1.0 - target.slowDownAmount, 1.0
+            val turnErrorMovementScaleDown = Range.clip(1.0 - abs(relativeFollowAngle /
+                            target.slowDownAngle), 1.0 - target.slowDownAmount, 1.0
             )
 
             xPower *= turnErrorMovementScaleDown
@@ -158,6 +155,10 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
     }
 
     fun followPath(path: Path, followAngle: Double): Boolean {
+        for (i in 0 until path.waypoints.size - 1) {
+            DebugApplicationServer.sendLine(Line(path[i].toPoint(), path[i+1].toPoint()))
+        }
+
         val extendedPath = Path(path)
 
         val clipped = Point(odometer.xPosition, odometer.yPosition).clippedToPath(path)
@@ -187,6 +188,8 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
             followPoint = Waypoint(path[path.lastIndex].x, path[path.lastIndex].y, followPoint)
         }
 
+        DebugApplicationServer.sendPoint(followPoint.toPoint())
+
         goToPoint(followPoint, followAngle)
 
         var currentFollowAngle = atan2(followPoint.y - odometer.yPosition,
@@ -197,7 +200,7 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
         return clippedDistToEnd < 10
     }
 
-    fun pointToAngle(angle: Double, power: Double, decelerationAngle: Double) {
+    fun pointToAngle(angle: Double, power: Double, decelerationAngle: Double): Boolean {
         // how far we are from the angle we want to be at
         val relativeAngle = wrapAngle(angle - odometer.angle)
         // adjusted for the slip experienced at our current angular velocity
@@ -212,5 +215,7 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
 
         // smooths across the last 3 degrees to prevent oscillation
         turnPower *= Range.clip(abs(relativeAngle) / toRadians(3.0), 0.0, 1.0)
+
+        return abs(relativeAngle) < toRadians(3.0)
     }
 }
