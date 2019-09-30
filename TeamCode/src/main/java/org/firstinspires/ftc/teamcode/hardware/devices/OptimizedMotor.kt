@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple
 import org.openftc.revextensions2.ExpansionHubMotor
 import kotlin.math.abs
 
-class OptimizedMotor(private val delegateMotor: ExpansionHubMotor, val isMaster: Boolean) {
+class OptimizedMotor(val delegateMotor: ExpansionHubMotor, val isMaster: Boolean) {
     val MIN_POWER_CHANGE = 0.005
     var currentPosition: Int = 0
     var lastPower: Double = 0.0
