@@ -8,7 +8,7 @@ import java.net.InetAddress
 import java.util.concurrent.Semaphore
 
 class UdpServer(val clientPort: Int) : Runnable {
-    var active = false
+    var active = true
     val sendLock = Semaphore(1)
     var lastSendMillis = 0L
     var currentUpdate = ""
@@ -18,10 +18,10 @@ class UdpServer(val clientPort: Int) : Runnable {
         while (true) {
             if (!active) break
             try {
-                if (SystemClock.uptimeMillis() - lastSendMillis < 50) {
+                if (System.currentTimeMillis() - lastSendMillis < 50) {
                     continue
                 }
-                lastSendMillis = SystemClock.uptimeMillis()
+                lastSendMillis = System.currentTimeMillis()
                 sendLock.acquire()
                 if (currentUpdate.isNotEmpty()) {
                     splitAndSend(currentUpdate)
@@ -57,11 +57,13 @@ class UdpServer(val clientPort: Int) : Runnable {
     private fun sendUdpRaw(message: String) {
         val serverSocket = DatagramSocket().use {
             val datagramPacket = DatagramPacket(
-                message.toByteArray(),
-                message.length,
-                InetAddress.getByName("127.0.0.1"), // TODO: Change address to debug laptop
-                clientPort
+                    message.toByteArray(),
+                    message.length,
+                    InetAddress.getByName("192.168.49.11"), // TODO: Change address to debug laptop
+                    clientPort
             )
+
+            it.send(datagramPacket)
         }
     }
 

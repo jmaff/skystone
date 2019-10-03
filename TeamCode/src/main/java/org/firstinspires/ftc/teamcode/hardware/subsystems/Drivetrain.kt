@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystems
 
 import android.os.SystemClock
+import com.qualcomm.robotcore.hardware.DcMotor
+import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.util.Range
 import org.firstinspires.ftc.teamcode.hardware.devices.OptimizedMotor
@@ -37,6 +39,22 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
     val currentTurnSlip
         get() = odometer.angularVelocity * TURN_SLIP_PER_RAD_PER_SEC
 
+    init {
+        topLeft.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+        topRight.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+        bottomLeft.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+        bottomRight.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+
+        topLeft.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+        topRight.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+        bottomLeft.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+        bottomRight.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+
+        topLeft.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
+        topRight.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
+        bottomLeft.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
+        bottomRight.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
+    }
     fun applyMotorPowers() {
         val currTime = SystemClock.uptimeMillis()
         if (currTime - lastUpdateTime < TIME_BETWEEN_UPDATES) {

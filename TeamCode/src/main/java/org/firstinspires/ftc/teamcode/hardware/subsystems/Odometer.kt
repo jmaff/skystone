@@ -4,6 +4,7 @@ import android.os.SystemClock
 import org.firstinspires.ftc.teamcode.hardware.devices.Encoder
 import org.firstinspires.ftc.teamcode.hardware.devices.OptimizedMotor
 import org.firstinspires.ftc.teamcode.motion.wrapAngle
+import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
@@ -11,13 +12,13 @@ import kotlin.math.sin
 class Odometer(leftDel: OptimizedMotor, rightDel: OptimizedMotor, lateralDel: OptimizedMotor) {
     val MIN_POSITION_CHANGE = 0.000000001
     val MIN_ANGLE_CHANGE = 0.000001
-    val FORWARD_CM_PER_COUNT = 0.0
-    val LATERAL_CM_PER_COUNT = 0.0
-    val RAD_PER_COUNT = 0.0
+    val FORWARD_CM_PER_COUNT = PI * 2 * 2.54 / 4000
+    val LATERAL_CM_PER_COUNT = PI * 2 * 2.54 / 4000
+    val RAD_PER_COUNT = 13.75 * 2.54 / 4000
     val PREDICTED_LATERAL_CM_PER_RAD = 0.0
     val TIME_BETWEEN_SPEED_UPDATES = 25
 
-    val leftDeadWheel : Encoder = Encoder(leftDel)
+    val leftDeadWheel : Encoder = Encoder(leftDel, true)
     val rightDeadWheel: Encoder = Encoder(rightDel)
     val lateralDeadWheel: Encoder = Encoder(lateralDel)
 
@@ -73,13 +74,13 @@ class Odometer(leftDel: OptimizedMotor, rightDel: OptimizedMotor, lateralDel: Op
         val lateralDeltaActual = lateralDeltaCounts * LATERAL_CM_PER_COUNT
 
         // change in robot angle
-        val angleDelta = (leftDeltaActual - rightDeltaActual) * RAD_PER_COUNT
+        val angleDelta = (rightDeltaActual - leftDeltaActual) * RAD_PER_COUNT
 
         // updating our absolute angle (need to use total counts traveled)
         val totalRightCounts = rightCurr - initialRightCounts
-        val totalLeftCounts = rightCurr - initialLeftCounts
+        val totalLeftCounts = leftCurr - initialLeftCounts
 
-        angle = wrapAngle(((totalLeftCounts - totalRightCounts) * RAD_PER_COUNT) +
+        angle = wrapAngle(((totalRightCounts * FORWARD_CM_PER_COUNT - totalLeftCounts * FORWARD_CM_PER_COUNT) * RAD_PER_COUNT) +
                 lastResetAngle)
 
         val lateralPrediction = angleDelta * PREDICTED_LATERAL_CM_PER_RAD
