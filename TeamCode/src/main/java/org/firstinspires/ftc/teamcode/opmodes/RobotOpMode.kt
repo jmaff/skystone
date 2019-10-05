@@ -11,6 +11,7 @@ import org.openftc.revextensions2.RevBulkData
 import org.openftc.revextensions2.RevExtensions2
 import java.lang.Exception
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import com.qualcomm.robotcore.hardware.Servo
 import kotlin.math.PI
 
 open class RobotOpMode: OpMode() {
@@ -20,12 +21,14 @@ open class RobotOpMode: OpMode() {
     var masterBulkData: RevBulkData? = null
     var lastLoopTime: Long = 0
     val elaspedTimeThisLoop = System.currentTimeMillis() - lastLoopTime
+    lateinit var grabber: Servo
 
     override fun init() {
         RevExtensions2.init()
         masterHub = hardwareMap.get(ExpansionHubEx::class.java, "Expansion Hub 2")
         drivetrain = Drivetrain(hardwareMap)
         subsystems.add(drivetrain)
+        grabber = hardwareMap.get(Servo::class.java, "Grabber")
         DebugApplicationServer.start()
         pollRevBulkData()
         lastLoopTime = System.currentTimeMillis()
@@ -43,12 +46,14 @@ open class RobotOpMode: OpMode() {
     override fun loop() {
         pollRevBulkData()
         drivetrain.odometer.updatePosition()
+        drivetrain.odometer.updateSpeed()
         DebugApplicationServer.sendRobotLocation(Point(drivetrain.odometer.xPosition, drivetrain.odometer.yPosition), drivetrain.odometer.angle)
 
 
         drivetrain.applyMotorPowers()
 
         lastLoopTime = System.currentTimeMillis()
+        DebugApplicationServer.clearLogPoints()
         DebugApplicationServer.markEndOfUpdate()
 
         telemetry.addData("X",drivetrain.odometer.xPosition)
@@ -78,7 +83,9 @@ open class RobotOpMode: OpMode() {
         }
     }
     fun stopMovement(){
-
+        drivetrain.xPower = 0.0
+        drivetrain.yPower = 0.0
+        drivetrain.turnPower = 0.0
     }
 
 }

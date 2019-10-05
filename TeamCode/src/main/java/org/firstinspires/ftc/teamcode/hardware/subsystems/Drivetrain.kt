@@ -13,9 +13,9 @@ import kotlin.math.*
 
 class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
     val MIN_MOTOR_POWER = 0.11
-    val Y_SLIP_PER_CM_PER_SEC = 0
-    val X_SLIP_PER_CM_PER_SEC = 0
-    val TURN_SLIP_PER_RAD_PER_SEC = 0
+    val Y_SLIP_PER_CM_PER_SEC = 0.14869
+    val X_SLIP_PER_CM_PER_SEC = 0.15253
+    val TURN_SLIP_PER_RAD_PER_SEC = 0.10694
     val TIME_BETWEEN_UPDATES = 16
 
     val topLeft: OptimizedMotor = OptimizedMotor(hardwareMap.get("TL") as ExpansionHubMotor, true)
@@ -92,7 +92,7 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
         }
     }
 
-    fun goToPoint(target: Waypoint, followAngle: Double) {
+    fun goToPoint(target: Waypoint, followAngle: Double): Boolean {
         // save current position values
         val currAngle = odometer.angle
         val xCurr = odometer.xPosition
@@ -146,8 +146,8 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
         ensureMovableMovementPowers()
 
         // smooth motion during the last 6cm and 2 degrees to prevent oscillation
-        xPower *= Range.clip(abs(relativeXToTarget) / 6.0, 0.0, 1.0)
-        yPower *= Range.clip(abs(relativeYToTarget) / 6.0, 0.0, 1.0)
+        xPower *= Range.clip(abs(relativeXToTarget) / 10.0, 0.0, 1.0)
+        yPower *= Range.clip(abs(relativeYToTarget) / 10.0, 0.0, 1.0)
         turnPower *= Range.clip(abs(relFollow) / toRadians(2.0), 0.0, 1.0)
 
         // only slow down if we are actually turning
@@ -160,6 +160,8 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
             xPower *= turnErrorMovementScaleDown
             yPower *= turnErrorMovementScaleDown
         }
+
+        return hypot(odometer.xPosition - target.x, odometer.yPosition - target.y) < 5
     }
 
     fun followPath(path: Path, followAngle: Double): Boolean {
