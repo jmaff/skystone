@@ -130,21 +130,11 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
         yPower = Range.clip(movementYPower, -target.movementPower, target.movementPower)
 
         /* Turning Stuff */
+        val actualFollow = (followAngle - toRadians(90.0))
+        val absFollow = absoluteAngleToTarget + actualFollow
+        val relFollow = wrapAngle(absFollow - currAngle)
 
-        // adjusted for what side of the robot we want pointed at the target (90 deg or pi/2 rad is
-        // the front)
-        val actualFollowAngle = followAngle - toRadians(90.0)
-        // absolute angle to the target point, not adjusted for slip
-        val rawAbsoluteAngleToTarget = hypot(target.x - xCurr, target.y - yCurr)
-        // what absolute angle we should be pointing towards
-        val absoluteFollowAngle = actualFollowAngle + rawAbsoluteAngleToTarget
-
-        // how far away we are from the absolute angle we need to point to
-        val relativeFollowAngle = wrapAngle(absoluteFollowAngle - currAngle)
-
-        val adjRelativeFollowAngle = wrapAngle(relativeFollowAngle - currentTurnSlip)
-
-        val turnSpeed = (adjRelativeFollowAngle / toRadians(30.0)) * target.turnPower
+        val turnSpeed = (relFollow / toRadians(30.0)) * target.turnPower
 
         turnPower = Range.clip(turnSpeed, -target.turnPower, target.turnPower)
 
@@ -158,12 +148,12 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
         // smooth motion during the last 6cm and 2 degrees to prevent oscillation
         xPower *= Range.clip(abs(relativeXToTarget) / 6.0, 0.0, 1.0)
         yPower *= Range.clip(abs(relativeYToTarget) / 6.0, 0.0, 1.0)
-        turnPower *= Range.clip(abs(relativeFollowAngle) / toRadians(2.0), 0.0, 1.0)
+        turnPower *= Range.clip(abs(relFollow) / toRadians(2.0), 0.0, 1.0)
 
         // only slow down if we are actually turning
         if (abs(turnPower) > 0.0001) {
             // slow down our movement if our current following angle is too far off
-            val turnErrorMovementScaleDown = Range.clip(1.0 - abs(relativeFollowAngle /
+            val turnErrorMovementScaleDown = Range.clip(1.0 - abs(relFollow /
                             target.slowDownAngle), 1.0 - target.slowDownAmount, 1.0
             )
 

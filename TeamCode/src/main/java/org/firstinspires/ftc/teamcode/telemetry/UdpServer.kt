@@ -59,7 +59,7 @@ class UdpServer(val clientPort: Int) : Runnable {
             val datagramPacket = DatagramPacket(
                     message.toByteArray(),
                     message.length,
-                    InetAddress.getByName("192.168.49.11"), // TODO: Change address to debug laptop
+                    InetAddress.getByName("192.168.49.97"), // TODO: Change address to debug laptop
                     clientPort
             )
 

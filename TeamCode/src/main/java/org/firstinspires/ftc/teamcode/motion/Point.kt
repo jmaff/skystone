@@ -17,7 +17,7 @@ class Point(val x: Double, val y: Double) {
         var closestClipIndex = 0
         var clippedPoint: Point = Point(0.0, 0.0)
 
-        for (i in 0 until path.waypoints.size) {
+        for (i in 0 until path.waypoints.size - 1) {
             val segment = Line(path[i].toPoint(), path[i + 1].toPoint())
             val clipped = clippedToLine(segment)
             val clipDistance = hypot(x - clipped.x, y - clipped.y)

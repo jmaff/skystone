@@ -13,9 +13,7 @@ import java.lang.Exception
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import kotlin.math.PI
 
-
-@TeleOp(name = "Odom Test")
-class RobotOpMode: OpMode() {
+open class RobotOpMode: OpMode() {
     lateinit var drivetrain: Drivetrain
     val subsystems = mutableListOf<Subsystem>()
     lateinit var masterHub: ExpansionHubEx
@@ -40,7 +38,6 @@ class RobotOpMode: OpMode() {
     }
 
     override fun start() {
-        drivetrain.odometer.resetPosition(17 / 2 * 2.54, 17.75 / 2 * 2.54, PI / 2)
     }
 
     override fun loop() {
@@ -49,22 +46,14 @@ class RobotOpMode: OpMode() {
         DebugApplicationServer.sendRobotLocation(Point(drivetrain.odometer.xPosition, drivetrain.odometer.yPosition), drivetrain.odometer.angle)
 
 
-        drivetrain.xPower = gamepad1.left_stick_x.toDouble()
-        drivetrain.yPower = -gamepad1.left_stick_y.toDouble()
-        drivetrain.turnPower = -gamepad1.right_stick_x.toDouble()
-
         drivetrain.applyMotorPowers()
 
-        telemetry.addData("LEFT",drivetrain.odometer.leftDeadWheel.counts)
-        telemetry.addData("RIGHT",drivetrain.odometer.rightDeadWheel.counts)
-        telemetry.addData("LATERAL",drivetrain.odometer.lateralDeadWheel.counts)
+        lastLoopTime = System.currentTimeMillis()
+        DebugApplicationServer.markEndOfUpdate()
 
         telemetry.addData("X",drivetrain.odometer.xPosition)
         telemetry.addData("Y",drivetrain.odometer.yPosition)
         telemetry.addData("ANGLE",drivetrain.odometer.angle)
-
-        lastLoopTime = System.currentTimeMillis()
-        DebugApplicationServer.markEndOfUpdate()
     }
 
     fun pollRevBulkData() {

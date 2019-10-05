@@ -4,18 +4,26 @@ import android.os.SystemClock
 import org.firstinspires.ftc.teamcode.hardware.devices.Encoder
 import org.firstinspires.ftc.teamcode.hardware.devices.OptimizedMotor
 import org.firstinspires.ftc.teamcode.motion.wrapAngle
-import kotlin.math.PI
-import kotlin.math.abs
-import kotlin.math.cos
-import kotlin.math.sin
+import kotlin.math.*
 
 class Odometer(leftDel: OptimizedMotor, rightDel: OptimizedMotor, lateralDel: OptimizedMotor) {
     val MIN_POSITION_CHANGE = 0.000000001
     val MIN_ANGLE_CHANGE = 0.000001
     val FORWARD_CM_PER_COUNT = PI * 2 * 2.54 / 4000
     val LATERAL_CM_PER_COUNT = PI * 2 * 2.54 / 4000
-    val RAD_PER_COUNT = 13.75 * 2.54 / 4000
-    val PREDICTED_LATERAL_CM_PER_RAD = 0.0
+//    val RAD_PER_COUNT = 13.75 * 2.54 / 4000
+//    val RAD_PER_COUNT = -1.099016 * 10.0.pow(-4)
+
+    val RAD_PER_COUNT = (2 * PI) / (-27500.166 - 29199.16)
+
+//    val RAD_PER_COUNT = -0.00029016892
+
+    // 0.00011039
+
+//    val p = 2.0 * PI * sqrt((6.875.pow(2) + 6.5.pow(2))/2.0)
+//    val PREDICTED_LATERAL_CM_PER_RAD = -(13.75* PI / 2 * PI) * (p / 13.75 * PI)
+//    val PREDICTED_LATERAL_CM_PER_RAD = -3995.744 * LATERAL_CM_PER_COUNT
+    val PREDICTED_LATERAL_CM_PER_RAD = (26032.5 * LATERAL_CM_PER_COUNT) / (2 * PI)
     val TIME_BETWEEN_SPEED_UPDATES = 25
 
     val leftDeadWheel : Encoder = Encoder(leftDel, true)
@@ -74,13 +82,13 @@ class Odometer(leftDel: OptimizedMotor, rightDel: OptimizedMotor, lateralDel: Op
         val lateralDeltaActual = lateralDeltaCounts * LATERAL_CM_PER_COUNT
 
         // change in robot angle
-        val angleDelta = (rightDeltaActual - leftDeltaActual) * RAD_PER_COUNT
+        val angleDelta = (leftDeltaCounts - rightDeltaCounts) * RAD_PER_COUNT
 
         // updating our absolute angle (need to use total counts traveled)
         val totalRightCounts = rightCurr - initialRightCounts
         val totalLeftCounts = leftCurr - initialLeftCounts
 
-        angle = wrapAngle(((totalRightCounts * FORWARD_CM_PER_COUNT - totalLeftCounts * FORWARD_CM_PER_COUNT) * RAD_PER_COUNT) +
+        angle = wrapAngle(((totalLeftCounts - totalRightCounts) * RAD_PER_COUNT) +
                 lastResetAngle)
 
         val lateralPrediction = angleDelta * PREDICTED_LATERAL_CM_PER_RAD
