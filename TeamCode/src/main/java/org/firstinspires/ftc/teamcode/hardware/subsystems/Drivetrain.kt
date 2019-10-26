@@ -4,11 +4,13 @@ import android.os.SystemClock
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.HardwareMap
+import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.util.Range
 import org.firstinspires.ftc.teamcode.hardware.devices.OptimizedMotor
 import org.firstinspires.ftc.teamcode.motion.*
 import org.firstinspires.ftc.teamcode.telemetry.DebugApplicationServer
 import org.openftc.revextensions2.ExpansionHubMotor
+import java.text.FieldPosition
 import kotlin.math.*
 
 class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
@@ -25,6 +27,11 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
         OptimizedMotor(hardwareMap.get("BR") as ExpansionHubMotor, true)
 
     override val motors: List<OptimizedMotor> = listOf(topLeft, topRight, bottomLeft, bottomRight)
+
+    val leftFoundation: Servo = hardwareMap.get("FOUNDATION_L") as Servo
+    val rightFoundation: Servo = hardwareMap.get("FOUNDATION_R") as Servo
+
+    var foundationDown = false
 
     val odometer: Odometer = Odometer(topLeft, topRight, bottomLeft)
 
@@ -90,6 +97,11 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
                 turnPower = minPower(turnPower, MIN_MOTOR_POWER)
             }
         }
+    }
+
+    fun setFoundationGrabberPosition(position: Double) {
+        leftFoundation.position = position
+        rightFoundation.position = 1.0 - position
     }
 
     fun goToPoint(target: Waypoint, followAngle: Double): Boolean {

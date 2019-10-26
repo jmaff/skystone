@@ -31,6 +31,7 @@ open class RobotOpMode: OpMode() {
         grabber = hardwareMap.get(Servo::class.java, "Grabber")
         DebugApplicationServer.start()
         pollRevBulkData()
+        DebugApplicationServer.clearLogPoints()
         lastLoopTime = System.currentTimeMillis()
     }
 
@@ -53,7 +54,6 @@ open class RobotOpMode: OpMode() {
         drivetrain.applyMotorPowers()
 
         lastLoopTime = System.currentTimeMillis()
-        DebugApplicationServer.clearLogPoints()
         DebugApplicationServer.markEndOfUpdate()
 
         telemetry.addData("X",drivetrain.odometer.xPosition)
