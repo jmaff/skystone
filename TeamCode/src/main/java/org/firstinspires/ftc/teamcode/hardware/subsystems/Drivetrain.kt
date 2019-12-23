@@ -13,27 +13,37 @@ import org.openftc.revextensions2.ExpansionHubMotor
 import java.text.FieldPosition
 import kotlin.math.*
 
-class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
-    val MIN_MOTOR_POWER = 0.11
-    val Y_SLIP_PER_CM_PER_SEC = 0.14869
-    val X_SLIP_PER_CM_PER_SEC = 0.15253
-    val TURN_SLIP_PER_RAD_PER_SEC = 0.10694
-    val TIME_BETWEEN_UPDATES = 16
+    class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
+        val MIN_MOTOR_POWER = 0.11
+        val Y_SLIP_PER_CM_PER_SEC = 0.100412
+        val X_SLIP_PER_CM_PER_SEC = 0.076687
+        val TURN_SLIP_PER_RAD_PER_SEC = 0.112481
+        val TIME_BETWEEN_UPDATES = 16
 
-    val topLeft: OptimizedMotor = OptimizedMotor(hardwareMap.get("TL") as ExpansionHubMotor, true)
-    val topRight: OptimizedMotor = OptimizedMotor(hardwareMap.get("TR") as ExpansionHubMotor, true)
-    val bottomLeft: OptimizedMotor = OptimizedMotor(hardwareMap.get("BL") as ExpansionHubMotor, true)
-    val bottomRight: OptimizedMotor =
-        OptimizedMotor(hardwareMap.get("BR") as ExpansionHubMotor, true)
+        val topLeft: OptimizedMotor = OptimizedMotor(hardwareMap.get("D.TL") as ExpansionHubMotor, true)
+        val topRight: OptimizedMotor = OptimizedMotor(hardwareMap.get("D.TR") as ExpansionHubMotor, true)
+        val bottomLeft: OptimizedMotor = OptimizedMotor(hardwareMap.get("D.BL") as ExpansionHubMotor, true)
+        val bottomRight: OptimizedMotor =
+                OptimizedMotor(hardwareMap.get("D.BR") as ExpansionHubMotor, true)
 
     override val motors: List<OptimizedMotor> = listOf(topLeft, topRight, bottomLeft, bottomRight)
 
-    val leftFoundation: Servo = hardwareMap.get("FOUNDATION_L") as Servo
-    val rightFoundation: Servo = hardwareMap.get("FOUNDATION_R") as Servo
+    val leftFoundation: Servo = hardwareMap.get("F.L") as Servo
+    val rightFoundation: Servo = hardwareMap.get("F.R") as Servo
 
     var foundationDown = false
+    set(value) {
+        field = value
+        if (value) {
+            leftFoundation.position = 0.62
+            rightFoundation.position = 1.0
+        } else {
+            leftFoundation.position = 0.8
+            rightFoundation.position = 0.69
+        }
+    }
 
-    val odometer: Odometer = Odometer(topLeft, topRight, bottomLeft)
+    val odometer: Odometer = Odometer(topRight, bottomRight, bottomLeft)
 
     var xPower = 0.0
     var yPower = 0.0
@@ -97,11 +107,6 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
                 turnPower = minPower(turnPower, MIN_MOTOR_POWER)
             }
         }
-    }
-
-    fun setFoundationGrabberPosition(position: Double) {
-        leftFoundation.position = position
-        rightFoundation.position = 1.0 - position
     }
 
     fun goToPoint(target: Waypoint, followAngle: Double): Boolean {

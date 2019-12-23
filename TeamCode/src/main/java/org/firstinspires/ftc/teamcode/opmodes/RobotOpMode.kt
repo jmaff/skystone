@@ -12,10 +12,14 @@ import org.openftc.revextensions2.RevExtensions2
 import java.lang.Exception
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.Servo
+import org.firstinspires.ftc.teamcode.hardware.subsystems.Intake
+import org.firstinspires.ftc.teamcode.hardware.subsystems.Vision
 import kotlin.math.PI
 
 open class RobotOpMode: OpMode() {
     lateinit var drivetrain: Drivetrain
+    lateinit var intake: Intake
+    lateinit var vision: Vision
     val subsystems = mutableListOf<Subsystem>()
     lateinit var masterHub: ExpansionHubEx
     var masterBulkData: RevBulkData? = null
@@ -25,9 +29,17 @@ open class RobotOpMode: OpMode() {
 
     override fun init() {
         RevExtensions2.init()
-        masterHub = hardwareMap.get(ExpansionHubEx::class.java, "Expansion Hub 2")
+        masterHub = hardwareMap.get(ExpansionHubEx::class.java, "Expansion Hub 1")
+
         drivetrain = Drivetrain(hardwareMap)
         subsystems.add(drivetrain)
+
+        intake = Intake(hardwareMap)
+        subsystems.add(intake)
+
+        vision = Vision(hardwareMap)
+        subsystems.add(vision)
+
         grabber = hardwareMap.get(Servo::class.java, "Grabber")
         DebugApplicationServer.start()
         pollRevBulkData()

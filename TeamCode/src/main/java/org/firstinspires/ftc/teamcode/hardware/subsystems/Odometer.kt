@@ -14,7 +14,7 @@ class Odometer(leftDel: OptimizedMotor, rightDel: OptimizedMotor, lateralDel: Op
 //    val RAD_PER_COUNT = 13.75 * 2.54 / 4000
 //    val RAD_PER_COUNT = -1.099016 * 10.0.pow(-4)
 
-    val RAD_PER_COUNT = (2 * PI) / (-27500.166 - 29199.16)
+    val RAD_PER_COUNT = (2 * PI) / (-30112.75 - 29890.25)
 
 //    val RAD_PER_COUNT = -0.00029016892
 
@@ -23,7 +23,7 @@ class Odometer(leftDel: OptimizedMotor, rightDel: OptimizedMotor, lateralDel: Op
 //    val p = 2.0 * PI * sqrt((6.875.pow(2) + 6.5.pow(2))/2.0)
 //    val PREDICTED_LATERAL_CM_PER_RAD = -(13.75* PI / 2 * PI) * (p / 13.75 * PI)
 //    val PREDICTED_LATERAL_CM_PER_RAD = -3995.744 * LATERAL_CM_PER_COUNT
-    val PREDICTED_LATERAL_CM_PER_RAD = (26032.5 * LATERAL_CM_PER_COUNT) / (2 * PI)
+    val PREDICTED_LATERAL_CM_PER_RAD = (8057.25 * LATERAL_CM_PER_COUNT) / (2 * PI)
     val TIME_BETWEEN_SPEED_UPDATES = 25
 
     val leftDeadWheel : Encoder = Encoder(leftDel, true)

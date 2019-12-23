@@ -1,13 +1,15 @@
 package org.firstinspires.ftc.teamcode.opmodes.Auto
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import org.firstinspires.ftc.teamcode.motion.Path
 import org.firstinspires.ftc.teamcode.motion.Waypoint
 import org.firstinspires.ftc.teamcode.motion.toRadians
 import org.firstinspires.ftc.teamcode.opmodes.RobotOpMode
 
-@Autonomous(name = "Red Auto")
-class RedAuto: Auto() {
+@Autonomous(name = "Testing Auto")
+@Disabled
+class TestingAuto: Auto() {
     override fun init() {
         super.init()
         drivetrain.odometer.resetPosition(17.75 / 2 * 2.54, (17 / 2 + 24 + (24-17)) * 2.54, 0.0)
@@ -88,7 +90,7 @@ class RedAuto: Auto() {
             8 -> {
                 drivetrain.yPower = -0.3
                 if (System.currentTimeMillis() - stateStartTime >= 700) {
-                    drivetrain.setFoundationGrabberPosition(0.0)
+                    drivetrain.foundationDown = true
                 }
                 if (System.currentTimeMillis() - stateStartTime >= 1200) {
                     incrementState()

@@ -6,6 +6,10 @@ import org.firstinspires.ftc.teamcode.opmodes.RobotOpMode
 open class Auto: RobotOpMode() {
     var state = 0
     var stateStartTime = 0L
+
+    val stateTimeElapsed
+    get() = System.currentTimeMillis() - stateStartTime
+
     var stateStartPosition = Point(0.0, 0.0)
     var stateStartAngle = 0.0
 
