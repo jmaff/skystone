@@ -81,8 +81,6 @@ class SkystoneReader : OpenCvPipeline() {
                 }
             }
 
-
-
             return input
         }
         // return an empty matrix if the input is null

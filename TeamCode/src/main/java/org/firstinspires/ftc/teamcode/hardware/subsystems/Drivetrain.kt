@@ -13,18 +13,18 @@ import org.openftc.revextensions2.ExpansionHubMotor
 import java.text.FieldPosition
 import kotlin.math.*
 
-    class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
-        val MIN_MOTOR_POWER = 0.11
-        val Y_SLIP_PER_CM_PER_SEC = 0.100412
-        val X_SLIP_PER_CM_PER_SEC = 0.076687
-        val TURN_SLIP_PER_RAD_PER_SEC = 0.112481
-        val TIME_BETWEEN_UPDATES = 16
+class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
+    val MIN_MOTOR_POWER = 0.11
+    val Y_SLIP_PER_CM_PER_SEC = 0.100412
+    val X_SLIP_PER_CM_PER_SEC = 0.076687
+    val TURN_SLIP_PER_RAD_PER_SEC = 0.112481
+    val TIME_BETWEEN_UPDATES = 16
 
-        val topLeft: OptimizedMotor = OptimizedMotor(hardwareMap.get("D.TL") as ExpansionHubMotor, true)
-        val topRight: OptimizedMotor = OptimizedMotor(hardwareMap.get("D.TR") as ExpansionHubMotor, true)
-        val bottomLeft: OptimizedMotor = OptimizedMotor(hardwareMap.get("D.BL") as ExpansionHubMotor, true)
-        val bottomRight: OptimizedMotor =
-                OptimizedMotor(hardwareMap.get("D.BR") as ExpansionHubMotor, true)
+    val topLeft: OptimizedMotor = OptimizedMotor(hardwareMap.get("D.TL") as ExpansionHubMotor, true)
+    val topRight: OptimizedMotor = OptimizedMotor(hardwareMap.get("D.TR") as ExpansionHubMotor, true)
+    val bottomLeft: OptimizedMotor = OptimizedMotor(hardwareMap.get("D.BL") as ExpansionHubMotor, true)
+    val bottomRight: OptimizedMotor =
+            OptimizedMotor(hardwareMap.get("D.BR") as ExpansionHubMotor, true)
 
     override val motors: List<OptimizedMotor> = listOf(topLeft, topRight, bottomLeft, bottomRight)
 
