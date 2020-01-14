@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystems
 
 import com.qualcomm.robotcore.hardware.DcMotor
+import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.Servo
 import com.qualcomm.robotcore.util.Range
@@ -23,7 +24,7 @@ class Transfer(hardwareMap: HardwareMap): Subsystem() {
     val FRONT_RELEASED = FRONT_UP
     val BACK_RELEASED = BACK_UP
     val PIVOT_REGULAR = 0.04
-    val PIVOT_PERPENDICULAR = 0.0
+    val PIVOT_PERPENDICULAR = 0.5
 
     val FOUR_BAR_POWER = 1.0
     val READY_POSITION = 0
@@ -48,7 +49,8 @@ class Transfer(hardwareMap: HardwareMap): Subsystem() {
         READY_FOR_STONE,
         GRABBED,
         PERPENDICULAR,
-        RELEASED
+        RELEASED,
+        RELEASED_PERP
     }
 
     var grabberState = GrabberState.READY_FOR_STONE
@@ -71,6 +73,12 @@ class Transfer(hardwareMap: HardwareMap): Subsystem() {
                 frontGrab.position = FRONT_GRABBED
             }
             GrabberState.RELEASED -> {
+                pivot.position = PIVOT_REGULAR
+                backGrab.position = BACK_RELEASED
+                frontGrab.position = FRONT_RELEASED
+            }
+            GrabberState.RELEASED_PERP -> {
+                pivot.position = PIVOT_PERPENDICULAR
                 backGrab.position = BACK_RELEASED
                 frontGrab.position = FRONT_RELEASED
             }
@@ -78,45 +86,97 @@ class Transfer(hardwareMap: HardwareMap): Subsystem() {
     }
 
     enum class FourBarPosition {
+        LONG_DOWN,
+        SHORT_UP,
+        LONG_UP,
         READY,
         GRAB,
         OUT
     }
 
-    var fourBarPosition = FourBarPosition.READY
-    set(value) {
-        prev = field
-        field = value
-    }
     var prev = FourBarPosition.READY
 
+    var fourBarPosition = FourBarPosition.LONG_DOWN
+    set(value) {
+        field = value
+        when (value) {
+            FourBarPosition.LONG_DOWN -> {
+                if (!running) {
+                    runFourBarFor(1100, -0.85)
+                }
+            }
+            FourBarPosition.LONG_UP -> {
+                if (!running) {
+                    runFourBarFor(1100, 0.85)
+                }
+            }
+            FourBarPosition.SHORT_UP -> {
+                if (!running) {
+                    runFourBarFor(200, 1.0)
+                }
+            }
+        }
+
+    }
+//    var prev = FourBarPosition.READY
+
+    var running = false
+    var startTime = 0L
+    var fourBarPower = 0.0
+    var time = 0L
+
+    fun runFourBarFor(time: Long, power: Double) {
+        running = true
+        startTime = System.currentTimeMillis()
+        this.time = time
+        fourBarPower = power
+    }
+
+    fun update() {
+        if (running) {
+            if (System.currentTimeMillis() - startTime >= time) {
+                fourBar.power = 0.0
+                running = false
+            } else {
+                fourBar.power = fourBarPower
+            }
+        }
+    }
+
+    var automatic = false
+
     fun runFourBarTo(position: FourBarPosition): Boolean {
-        val error = when (position) {
-            FourBarPosition.READY -> READY_POSITION - fourBar.currentPosition
-            FourBarPosition.GRAB -> GRAB_POSITION - fourBar.currentPosition
-            FourBarPosition.OUT -> OUT_POSITION - fourBar.currentPosition
-        }
-
-        val decelerationInterval: Int = when (position) {
-            FourBarPosition.OUT -> 500
-            FourBarPosition.READY -> {
-                if (prev == FourBarPosition.OUT) {
-                    400
-                } else {
-                    200
-                }
+        if (automatic) {
+            val error = when (position) {
+                FourBarPosition.READY -> READY_POSITION - fourBar.currentPosition
+                FourBarPosition.GRAB -> GRAB_POSITION - fourBar.currentPosition
+                FourBarPosition.OUT -> OUT_POSITION - fourBar.currentPosition
+                else -> 0
             }
-            FourBarPosition.GRAB -> {
-                if (prev == FourBarPosition.READY) {
-                    50
-                } else {
-                    150
-                }
-            }
-        }
 
-        val power = error.toDouble() / decelerationInterval.toDouble()
-        fourBar.power = Range.clip(power, -FOUR_BAR_POWER, FOUR_BAR_POWER)
-        return abs(error) < 4
+            val decelerationInterval: Int = when (position) {
+                FourBarPosition.OUT -> 300
+                FourBarPosition.READY -> {
+                    if (prev == FourBarPosition.OUT) {
+                        250
+                    } else {
+                        200
+                    }
+                }
+                FourBarPosition.GRAB -> {
+                    if (prev == FourBarPosition.READY) {
+                        50
+                    } else {
+                        150
+                    }
+                }
+                else -> 0
+            }
+
+            val power = error.toDouble() / decelerationInterval.toDouble()
+            fourBar.power = Range.clip(power, -FOUR_BAR_POWER, FOUR_BAR_POWER)
+            return abs(error) < 4
+        }
+        return true
     }
 }

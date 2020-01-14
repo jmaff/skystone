@@ -20,10 +20,15 @@ class Chamber(hardwareMap: HardwareMap): Subsystem() {
     var stoneOrientation: StoneOrientation = StoneOrientation.NORMAL
         set(value) {
             field = value
-            orient.position = when (value) {
-                StoneOrientation.NORMAL -> 0.5
-                StoneOrientation.PEGS_LEFT -> 0.9
-                StoneOrientation.PEGS_RIGHT -> 0.1
+            when (value) {
+                StoneOrientation.PEGS_LEFT -> orient.position = 0.6
+                StoneOrientation.PEGS_RIGHT -> orient.position = 0.4
+                StoneOrientation.NORMAL -> orient.position = 0.5
             }
+//            orient.position = when (value) {
+//                StoneOrientation.NORMAL -> 0.5
+//                StoneOrientation.PEGS_LEFT -> 0.7
+//                StoneOrientation.PEGS_RIGHT -> 0.3
+//            }
         }
 }

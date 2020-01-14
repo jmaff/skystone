@@ -8,8 +8,8 @@ import org.firstinspires.ftc.teamcode.hardware.subsystems.Intake
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Transfer
 import kotlin.math.PI
 
-@TeleOp(name = "TeleOp")
-class TeleOp: RobotOpMode() {
+@TeleOp(name = "Testing TeleOp")
+class TestingTeleOp: RobotOpMode() {
     lateinit var gamer1: EnhancedGamepad
     override fun start() {
         gamer1 = EnhancedGamepad(gamepad1)
@@ -18,6 +18,7 @@ class TeleOp: RobotOpMode() {
     }
 
     var turning = false
+//    var stonePossessed = false
     override fun loop() {
         super.loop()
         gamer1.update()
@@ -41,21 +42,39 @@ class TeleOp: RobotOpMode() {
             intake.right.position = 0.5
         }
 
-        if (gamer1.B.pressed) {
-            if (!turning) {
-                drivetrain.turnPower = 0.3
-                turning = true
-            } else {
-                drivetrain.turnPower = 0.0
-                turning = false
-            }
-        }
+//        if (gamer1.B.pressed) {
+//            if (!turning) {
+//                drivetrain.turnPower = 0.3
+//                turning = true
+//            } else {
+//                drivetrain.turnPower = 0.0
+//                turning = false
+//            }
+//        }
+
+//        if (gamer1.B.pressed) {
+//            if (chamber.stoneOrientation == Chamber.StoneOrientation.NORMAL) {
+//                chamber.stoneOrientation = Chamber.StoneOrientation.PEGS_LEFT
+//            } else {
+//                chamber.stoneOrientation = Chamber.StoneOrientation.NORMAL
+//            }
+//        }
+//
+//        if (gamer1.Y.pressed) {
+//            if (chamber.stoneOrientation == Chamber.StoneOrientation.NORMAL) {
+//                chamber.stoneOrientation = Chamber.StoneOrientation.PEGS_RIGHT
+//            } else {
+//                chamber.stoneOrientation = Chamber.StoneOrientation.NORMAL
+//            }
+//        }
 
         if (gamer1.X.pressed) {
             if (transfer.grabberState == Transfer.GrabberState.READY_FOR_STONE) {
                 transfer.grabberState = Transfer.GrabberState.GRABBED
+                stonePossessed = true
             } else if (transfer.grabberState == Transfer.GrabberState.GRABBED) {
                 transfer.grabberState = Transfer.GrabberState.RELEASED
+                stonePossessed = false
             }
         }
 
@@ -71,28 +90,29 @@ class TeleOp: RobotOpMode() {
 //            else -> 0.0
 //        }
 
-        if (gamer1.DPAD_UP.pressed) {
-            if (transfer.fourBarPosition == Transfer.FourBarPosition.READY) {
-                transfer.fourBarPosition = Transfer.FourBarPosition.GRAB
-            } else if (transfer.fourBarPosition == Transfer.FourBarPosition.GRAB) {
-                transfer.fourBarPosition = Transfer.FourBarPosition.OUT
-            }
-        }
-
-        if (gamer1.DPAD_DOWN.pressed) {
-            if (transfer.fourBarPosition == Transfer.FourBarPosition.GRAB) {
-                transfer.fourBarPosition = Transfer.FourBarPosition.READY
-            } else if (transfer.fourBarPosition == Transfer.FourBarPosition.OUT) {
-                transfer.fourBarPosition = Transfer.FourBarPosition.GRAB
-                transfer.grabberState = Transfer.GrabberState.READY_FOR_STONE
-            }
-        }
-
-//        chamber.stoneOrientation = when {
-//            chamber.leftDist.getDistance(DistanceUnit.CM) < 5.5 -> Chamber.StoneOrientation.PEGS_LEFT
-//            chamber.rightDist.getDistance(DistanceUnit.CM) < 5.5 -> Chamber.StoneOrientation.PEGS_RIGHT
-//            else -> Chamber.StoneOrientation.NORMAL
+//        if (gamer1.DPAD_UP.pressed) {
+//            if (transfer.fourBarPosition == Transfer.FourBarPosition.READY) {
+//                transfer.fourBarPosition = Transfer.FourBarPosition.GRAB
+//            } else if (transfer.fourBarPosition == Transfer.FourBarPosition.GRAB) {
+//                transfer.fourBarPosition = Transfer.FourBarPosition.OUT
+//            }
 //        }
+//
+//        if (gamer1.DPAD_DOWN.pressed) {
+//            if (transfer.fourBarPosition == Transfer.FourBarPosition.GRAB) {
+//                transfer.fourBarPosition = Transfer.FourBarPosition.READY
+//            } else if (transfer.fourBarPosition == Transfer.FourBarPosition.OUT) {
+//                transfer.fourBarPosition = Transfer.FourBarPosition.GRAB
+//                transfer.grabberState = Transfer.GrabberState.READY_FOR_STONE
+//            }
+//        }
+
+        chamber.stoneOrientation = when {
+            chamber.leftDist.getDistance(DistanceUnit.CM) < 5.5 && chamber.rightDist.getDistance(DistanceUnit.CM) > 7.4 && !stonePossessed-> Chamber.StoneOrientation.PEGS_LEFT
+            chamber.rightDist.getDistance(DistanceUnit.CM) < 5.5 && chamber.leftDist.getDistance(DistanceUnit.CM) > 7.4 && !stonePossessed -> Chamber.StoneOrientation.PEGS_RIGHT
+            stonePossessed -> Chamber.StoneOrientation.NORMAL
+            else -> chamber.stoneOrientation
+        }
 
         telemetry.addData("C LEFT", chamber.leftDist.getDistance(DistanceUnit.CM))
         telemetry.addData("C RIGHT", chamber.rightDist.getDistance(DistanceUnit.CM))

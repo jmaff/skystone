@@ -7,14 +7,14 @@ import org.openftc.easyopencv.OpenCvPipeline
 
 
 class SkystoneReader : OpenCvPipeline() {
-    val hMin = 95.0
-    val hMax = 105.0
-    val sMin = 160.0
-    val vMin = 0.0
+    var hMin = 95.0
+    var hMax = 105.0
+    var sMin = 160.0
+    var vMin = 0.0
 
     var currentHSV = listOf(0.0, 0.0, 0.0)
 
-    val leftBound = 40
+    var leftBound = 40
     val upperBound = 75
     val stoneWidth = 90
     val stoneHeight = 40
@@ -47,12 +47,12 @@ class SkystoneReader : OpenCvPipeline() {
             val rect = Rect(input.cols() / 2, input.rows() / 2, 20, 20)
             rectangle(hsvMat, rect, Scalar(0.0, 255.0, 0.0))
 
-//            val stoneRect = Rect(leftBound, upperBound, stoneWidth, stoneHeight)
-//            rectangle(input, stoneRect, Scalar(255.0, 0.0, 0.0))
-//            for (i in 0..2) {
-//                val other = Rect(leftBound+stoneWidth*i, upperBound, stoneWidth, stoneHeight)
-//                rectangle(input, other, Scalar(255.0, 0.0, 0.0))
-//            }
+            val stoneRect = Rect(leftBound, upperBound, stoneWidth, stoneHeight)
+            rectangle(input, stoneRect, Scalar(255.0, 0.0, 0.0))
+            for (i in 0..2) {
+                val other = Rect(leftBound+stoneWidth*i, upperBound, stoneWidth, stoneHeight)
+                rectangle(input, other, Scalar(255.0, 0.0, 0.0))
+            }
 
             val stoneROIs = Array(3) { i ->
                 Rect(leftBound + stoneWidth*i, upperBound, stoneWidth, stoneHeight)

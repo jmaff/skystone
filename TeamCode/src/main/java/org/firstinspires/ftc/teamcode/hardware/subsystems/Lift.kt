@@ -16,6 +16,8 @@ class Lift(hardwareMap: HardwareMap): Subsystem() {
         motor1.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
         motor2.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
         motor3.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
+        motor1.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
+        motor1.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
     }
 
     override val motors = listOf(motor1, motor2, motor3)

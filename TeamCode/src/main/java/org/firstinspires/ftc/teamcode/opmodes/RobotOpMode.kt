@@ -10,6 +10,7 @@ import org.openftc.revextensions2.RevExtensions2
 import java.lang.Exception
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.Servo
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.hardware.subsystems.*
 import kotlin.math.PI
 
@@ -68,6 +69,8 @@ open class RobotOpMode: OpMode() {
     override fun start() {
     }
 
+    var stonePossessed = false
+
     override fun loop() {
         pollRevBulkData()
         drivetrain.odometer.updatePosition()
@@ -77,6 +80,14 @@ open class RobotOpMode: OpMode() {
 
         drivetrain.applyMotorPowers()
         transfer.runFourBarTo(transfer.fourBarPosition)
+        transfer.update()
+
+//                chamber.stoneOrientation = when {
+//            chamber.leftDist.getDistance(DistanceUnit.CM) < 5.5 && chamber.rightDist.getDistance(DistanceUnit.CM) > 7.4 && !stonePossessed-> Chamber.StoneOrientation.PEGS_LEFT
+//            chamber.rightDist.getDistance(DistanceUnit.CM) < 5.5 && chamber.leftDist.getDistance(DistanceUnit.CM) > 7.4 && !stonePossessed -> Chamber.StoneOrientation.PEGS_RIGHT
+//            stonePossessed -> Chamber.StoneOrientation.NORMAL
+//            else -> chamber.stoneOrientation
+//        }
 
         lastLoopTime = System.currentTimeMillis()
         DebugApplicationServer.markEndOfUpdate()
