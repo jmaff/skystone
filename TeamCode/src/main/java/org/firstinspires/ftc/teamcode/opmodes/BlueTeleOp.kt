@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.DcMotor
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
@@ -9,7 +10,8 @@ import org.firstinspires.ftc.teamcode.hardware.subsystems.Intake
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Transfer
 import kotlin.math.PI
 
-@TeleOp(name = "Blue TeleOp")
+@Disabled
+@TeleOp(name = "Blue TeleOp Old")
 class BlueTeleOp: RobotOpMode() {
     lateinit var gamer1: EnhancedGamepad
     lateinit var gamer2: EnhancedGamepad

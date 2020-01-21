@@ -9,8 +9,8 @@ import org.firstinspires.ftc.teamcode.hardware.subsystems.Intake
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Transfer
 import kotlin.math.PI
 
-@TeleOp(name = "Red TeleOp")
-class RedTeleOp: RobotOpMode() {
+@TeleOp(name = "Blue TeleOp")
+class BlueTeleOpNew: RobotOpMode() {
     lateinit var gamer1: EnhancedGamepad
     lateinit var gamer2: EnhancedGamepad
 
@@ -116,7 +116,7 @@ class RedTeleOp: RobotOpMode() {
         }
 
         if (gamer1.DPAD_DOWN.state) {
-            drivetrain.xPower = -0.4
+            drivetrain.xPower = 0.4
             drivetrain.turnPower = turn_p * (angleLock - drivetrain.odometer.angle)
         }
 
@@ -126,11 +126,11 @@ class RedTeleOp: RobotOpMode() {
         }
 
         if (gamer1.DPAD_LEFT.state) {
-            drivetrain.yPower = 0.4
+            drivetrain.yPower = -0.4
         }
 
         if (gamer1.DPAD_RIGHT.state) {
-            drivetrain.yPower = -0.4
+            drivetrain.yPower = 0.4
         }
 
 
@@ -143,7 +143,7 @@ class RedTeleOp: RobotOpMode() {
         }
 
         if (gamer1.DPAD_UP.state) {
-            drivetrain.xPower = 0.4
+            drivetrain.xPower = -0.4
             drivetrain.turnPower = turn_p * (angleLock - drivetrain.odometer.angle)
         }
 

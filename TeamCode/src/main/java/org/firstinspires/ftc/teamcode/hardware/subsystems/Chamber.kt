@@ -21,8 +21,8 @@ class Chamber(hardwareMap: HardwareMap): Subsystem() {
         set(value) {
             field = value
             when (value) {
-                StoneOrientation.PEGS_LEFT -> orient.position = 0.6
-                StoneOrientation.PEGS_RIGHT -> orient.position = 0.4
+                StoneOrientation.PEGS_LEFT -> orient.position = 0.9
+                StoneOrientation.PEGS_RIGHT -> orient.position = 0.1
                 StoneOrientation.NORMAL -> orient.position = 0.5
             }
 //            orient.position = when (value) {

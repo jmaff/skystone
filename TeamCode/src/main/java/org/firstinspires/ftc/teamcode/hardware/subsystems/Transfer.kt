@@ -12,16 +12,16 @@ import kotlin.math.abs
 class Transfer(hardwareMap: HardwareMap): Subsystem() {
     // front up: 0, front down: 1
     val FRONT_UP = 0.0
-    val FRONT_DOWN = 0.9
+    val FRONT_DOWN = 0.8
 
     val BACK_UP = 1.0
     val BACK_DOWN = 0.0
 
     val FRONT_READY = FRONT_UP
-    val BACK_READY = 0.1
-    val FRONT_GRABBED = FRONT_DOWN
-    val BACK_GRABBED = BACK_DOWN
-    val FRONT_RELEASED = FRONT_UP
+    val BACK_READY = 0.2
+    val FRONT_GRABBED = 0.80
+    val BACK_GRABBED = 0.1
+    val FRONT_RELEASED = 0.55
     val BACK_RELEASED = BACK_UP
     val PIVOT_REGULAR = 0.04
     val PIVOT_PERPENDICULAR = 0.5
@@ -30,7 +30,11 @@ class Transfer(hardwareMap: HardwareMap): Subsystem() {
     val READY_POSITION = 0
     val GRAB_POSITION = 180
     val OUT_POSITION = 650
+    val CLEAR_POSITION = 470
     val DECELERATION_INTERVAL = 400 // in encoder counts
+
+    val CAP_HOLD = 0.62
+    val CAP_RELEASE = 0.20
 
     val fourBar = OptimizedMotor(hardwareMap.get("T.Fb") as ExpansionHubMotor, false)
     override val motors = listOf(fourBar)
@@ -44,13 +48,16 @@ class Transfer(hardwareMap: HardwareMap): Subsystem() {
     val backGrab = hardwareMap.get("T.B") as Servo
     val frontGrab = hardwareMap.get("T.F") as Servo
     val pivot = hardwareMap.get("T.P") as Servo
+    val capstone = hardwareMap.get("T.C") as Servo
 
     enum class GrabberState {
         READY_FOR_STONE,
         GRABBED,
         PERPENDICULAR,
         RELEASED,
-        RELEASED_PERP
+        RELEASED_PERP,
+        OUTSIDE_READY,
+        OUTSIDE_GRABBED
     }
 
     var grabberState = GrabberState.READY_FOR_STONE
@@ -82,6 +89,17 @@ class Transfer(hardwareMap: HardwareMap): Subsystem() {
                 backGrab.position = BACK_RELEASED
                 frontGrab.position = FRONT_RELEASED
             }
+            GrabberState.OUTSIDE_READY -> {
+                pivot.position = PIVOT_REGULAR
+                backGrab.position = BACK_RELEASED
+                frontGrab.position = 0.75
+            }
+            GrabberState.OUTSIDE_GRABBED -> {
+                pivot.position = PIVOT_REGULAR
+                // TODO: Tune
+                backGrab.position = BACK_DOWN
+                frontGrab.position = FRONT_DOWN
+            }
         }
     }
 
@@ -91,7 +109,8 @@ class Transfer(hardwareMap: HardwareMap): Subsystem() {
         LONG_UP,
         READY,
         GRAB,
-        OUT
+        OUT,
+        CLEAR_FOUNDATION
     }
 
     var prev = FourBarPosition.READY
@@ -151,6 +170,7 @@ class Transfer(hardwareMap: HardwareMap): Subsystem() {
                 FourBarPosition.READY -> READY_POSITION - fourBar.currentPosition
                 FourBarPosition.GRAB -> GRAB_POSITION - fourBar.currentPosition
                 FourBarPosition.OUT -> OUT_POSITION - fourBar.currentPosition
+                FourBarPosition.CLEAR_FOUNDATION -> CLEAR_POSITION - fourBar.currentPosition
                 else -> 0
             }
 
@@ -170,6 +190,7 @@ class Transfer(hardwareMap: HardwareMap): Subsystem() {
                         150
                     }
                 }
+                FourBarPosition.CLEAR_FOUNDATION -> 50
                 else -> 0
             }
 

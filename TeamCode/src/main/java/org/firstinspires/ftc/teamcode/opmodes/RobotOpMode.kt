@@ -54,6 +54,7 @@ open class RobotOpMode: OpMode() {
         subsystems.add(chamber)
 
         grabber = hardwareMap.get(Servo::class.java, "Grabber")
+        transfer.capstone.position = transfer.CAP_HOLD
         DebugApplicationServer.start()
         pollRevBulkData()
         DebugApplicationServer.clearLogPoints()
@@ -82,12 +83,7 @@ open class RobotOpMode: OpMode() {
         transfer.runFourBarTo(transfer.fourBarPosition)
         transfer.update()
 
-//                chamber.stoneOrientation = when {
-//            chamber.leftDist.getDistance(DistanceUnit.CM) < 5.5 && chamber.rightDist.getDistance(DistanceUnit.CM) > 7.4 && !stonePossessed-> Chamber.StoneOrientation.PEGS_LEFT
-//            chamber.rightDist.getDistance(DistanceUnit.CM) < 5.5 && chamber.leftDist.getDistance(DistanceUnit.CM) > 7.4 && !stonePossessed -> Chamber.StoneOrientation.PEGS_RIGHT
-//            stonePossessed -> Chamber.StoneOrientation.NORMAL
-//            else -> chamber.stoneOrientation
-//        }
+
 
         lastLoopTime = System.currentTimeMillis()
         DebugApplicationServer.markEndOfUpdate()
