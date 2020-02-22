@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmodes
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.control.EnhancedGamepad
-import org.firstinspires.ftc.teamcode.hardware.subsystems.Chamber
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Intake
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Transfer
 import kotlin.math.PI
@@ -35,11 +34,6 @@ class TestingTeleOp: RobotOpMode() {
             } else {
                 intake.state = Intake.State.OFF
             }
-        }
-
-        if (gamer1.LEFT_BUMPER.pressed) {
-            intake.left.position = 0.1
-            intake.right.position = 0.5
         }
 
 //        if (gamer1.B.pressed) {
@@ -107,16 +101,7 @@ class TestingTeleOp: RobotOpMode() {
 //            }
 //        }
 
-        chamber.stoneOrientation = when {
-            chamber.leftDist.getDistance(DistanceUnit.CM) < 5.5 && chamber.rightDist.getDistance(DistanceUnit.CM) > 7.4 && !stonePossessed-> Chamber.StoneOrientation.PEGS_LEFT
-            chamber.rightDist.getDistance(DistanceUnit.CM) < 5.5 && chamber.leftDist.getDistance(DistanceUnit.CM) > 7.4 && !stonePossessed -> Chamber.StoneOrientation.PEGS_RIGHT
-            stonePossessed -> Chamber.StoneOrientation.NORMAL
-            else -> chamber.stoneOrientation
-        }
 
-        telemetry.addData("C LEFT", chamber.leftDist.getDistance(DistanceUnit.CM))
-        telemetry.addData("C RIGHT", chamber.rightDist.getDistance(DistanceUnit.CM))
-        telemetry.addData("FOUR BAR", transfer.fourBar.currentPosition)
         telemetry.addData("LEFT",drivetrain.odometer.leftDeadWheel.counts)
         telemetry.addData("RIGHT",drivetrain.odometer.rightDeadWheel.counts)
         telemetry.addData("LATERAL",drivetrain.odometer.lateralDeadWheel.counts)

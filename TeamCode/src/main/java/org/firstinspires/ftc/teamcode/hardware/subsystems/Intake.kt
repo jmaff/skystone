@@ -1,29 +1,29 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystems
 
 import com.qualcomm.robotcore.hardware.CRServo
+import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.Servo
+import org.firstinspires.ftc.teamcode.hardware.devices.OptimizedMotor
+import org.openftc.revextensions2.ExpansionHubMotor
 import java.time.OffsetDateTime
 
 class Intake(hardwareMap: HardwareMap): Subsystem() {
-    val left: Servo = hardwareMap.get("I.L") as Servo
-    val right: Servo = hardwareMap.get("I.R") as Servo
+    val motor: OptimizedMotor = OptimizedMotor(hardwareMap.get("I.M") as ExpansionHubMotor, false)
+    override val motors: List<OptimizedMotor> = listOf(motor)
 
     var state: State = State.OFF
     set(value) {
         field = value
         when (value) {
             State.OFF -> {
-                left.position = 0.5
-                right.position = 0.5
+                motor.power = 0.0
             }
             State.IN -> {
-                left.position = 0.1
-                right.position = 0.9
+                motor.power = 1.0
             }
             State.OUT -> {
-                left.position = 0.9
-                right.position = 0.1
+                motor.power = -1.0
             }
         }
     }

@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystems
 
 import android.os.SystemClock
-import com.qualcomm.robotcore.hardware.DcMotor
-import com.qualcomm.robotcore.hardware.DcMotorSimple
-import com.qualcomm.robotcore.hardware.HardwareMap
-import com.qualcomm.robotcore.hardware.Servo
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro
+import com.qualcomm.robotcore.hardware.*
 import com.qualcomm.robotcore.util.Range
 import org.firstinspires.ftc.teamcode.hardware.devices.OptimizedMotor
 import org.firstinspires.ftc.teamcode.motion.*
@@ -15,9 +13,14 @@ import kotlin.math.*
 
 class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
     val MIN_MOTOR_POWER = 0.11
-    val Y_SLIP_PER_CM_PER_SEC = 0.100412
-    val X_SLIP_PER_CM_PER_SEC = 0.076687
-    val TURN_SLIP_PER_RAD_PER_SEC = 0.112481
+//    val Y_SLIP_PER_CM_PER_SEC = 0.100412
+//    val X_SLIP_PER_CM_PER_SEC = 0.076687
+//    val TURN_SLIP_PER_RAD_PER_SEC = 0.112481
+
+    val Y_SLIP_PER_CM_PER_SEC = 0.157615
+    val X_SLIP_PER_CM_PER_SEC = 0.0758789
+    val TURN_SLIP_PER_RAD_PER_SEC = 0.0616667
+
     val TIME_BETWEEN_UPDATES = 16
 
     val topLeft: OptimizedMotor = OptimizedMotor(hardwareMap.get("D.TL") as ExpansionHubMotor, true)
@@ -25,11 +28,18 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
     val bottomLeft: OptimizedMotor = OptimizedMotor(hardwareMap.get("D.BL") as ExpansionHubMotor, true)
     val bottomRight: OptimizedMotor =
             OptimizedMotor(hardwareMap.get("D.BR") as ExpansionHubMotor, true)
+    val gyro = hardwareMap.get("gyro") as ModernRoboticsI2cGyro
+    val stoneSensor = hardwareMap.get("dist") as DistanceSensor
 
     override val motors: List<OptimizedMotor> = listOf(topLeft, topRight, bottomLeft, bottomRight)
 
     val leftFoundation: Servo = hardwareMap.get("F.L") as Servo
     val rightFoundation: Servo = hardwareMap.get("F.R") as Servo
+
+    val RIGHT_DOWN = 0.994 // 2488
+    val RIGHT_UP = 0.6535 // 1807
+    val LEFT_UP = 0.8315 // 2163
+    val LEFT_DOWN = 0.5625 // 1625
 
     var foundationDown = false
     set(value) {
@@ -43,7 +53,7 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
         }
     }
 
-    val odometer: Odometer = Odometer(topRight, bottomRight, bottomLeft)
+    val odometer: Odometer = Odometer(topRight, bottomRight, bottomLeft, gyro)
 
     var xPower = 0.0
     var yPower = 0.0
@@ -71,6 +81,8 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
         topRight.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
         bottomLeft.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
         bottomRight.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
+
+        gyro.calibrate()
     }
     fun applyMotorPowers() {
         val currTime = SystemClock.uptimeMillis()

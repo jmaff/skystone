@@ -20,7 +20,6 @@ open class RobotOpMode: OpMode() {
     lateinit var vision: Vision
     lateinit var lift: Lift
     lateinit var transfer: Transfer
-    lateinit var chamber: Chamber
     val subsystems = mutableListOf<Subsystem>()
     lateinit var masterHub: ExpansionHubEx
     lateinit var slaveHub: ExpansionHubEx
@@ -32,7 +31,7 @@ open class RobotOpMode: OpMode() {
 
     override fun init() {
         RevExtensions2.init()
-        masterHub = hardwareMap.get(ExpansionHubEx::class.java, "Expansion Hub 1")
+        masterHub = hardwareMap.get(ExpansionHubEx::class.java, "Expansion Hub 3")
         slaveHub = hardwareMap.get(ExpansionHubEx::class.java, "Expansion Hub 2")
 
         drivetrain = Drivetrain(hardwareMap)
@@ -50,10 +49,6 @@ open class RobotOpMode: OpMode() {
         transfer = Transfer(hardwareMap)
         subsystems.add(transfer)
 
-        chamber = Chamber(hardwareMap)
-        subsystems.add(chamber)
-
-        grabber = hardwareMap.get(Servo::class.java, "Grabber")
         transfer.capstone.position = transfer.CAP_HOLD
         DebugApplicationServer.start()
         pollRevBulkData()
@@ -80,7 +75,6 @@ open class RobotOpMode: OpMode() {
 
 
         drivetrain.applyMotorPowers()
-        transfer.runFourBarTo(transfer.fourBarPosition)
         transfer.update()
 
 

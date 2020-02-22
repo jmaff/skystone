@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes.Auto
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Intake
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Transfer
@@ -9,6 +10,7 @@ import org.firstinspires.ftc.teamcode.motion.Waypoint
 import org.firstinspires.ftc.teamcode.motion.toRadians
 import org.firstinspires.ftc.teamcode.vision.SkystoneReader
 
+@Disabled
 @Autonomous(name = "Drop Intake")
 class DropIntake: Auto() {
     lateinit var stonePosition: SkystoneReader.StonePosition
@@ -28,9 +30,9 @@ class DropIntake: Auto() {
 
     override fun start() {
         super.start()
-        drivetrain.odometer.resetPosition(365.76 - 17.75 / 2 * 2.54, (17 / 2 + 24 + (24-17)) * 2.54, Math.PI)
-        stonePosition = vision.skystoneReader.stonePosition
-        transfer.automatic = true
+//        drivetrain.odometer.resetPosition(365.76 - 17.75 / 2 * 2.54, (17 / 2 + 24 + (24-17)) * 2.54, Math.PI)
+//        stonePosition = vision.skystoneReader.stonePosition
+//        transfer.automatic = true
     }
 
     override fun loop() {

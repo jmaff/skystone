@@ -1,20 +1,27 @@
 package org.firstinspires.ftc.teamcode.hardware.subsystems
 
 import android.os.SystemClock
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro
 import org.firstinspires.ftc.teamcode.hardware.devices.Encoder
 import org.firstinspires.ftc.teamcode.hardware.devices.OptimizedMotor
+import org.firstinspires.ftc.teamcode.motion.toRadians
 import org.firstinspires.ftc.teamcode.motion.wrapAngle
 import kotlin.math.*
 
-class Odometer(leftDel: OptimizedMotor, rightDel: OptimizedMotor, lateralDel: OptimizedMotor) {
+class Odometer(leftDel: OptimizedMotor, rightDel: OptimizedMotor, lateralDel: OptimizedMotor, val gyro: ModernRoboticsI2cGyro) {
     val MIN_POSITION_CHANGE = 0.000000001
     val MIN_ANGLE_CHANGE = 0.000001
-    val FORWARD_CM_PER_COUNT = PI * 2 * 2.54 / 4000
-    val LATERAL_CM_PER_COUNT = PI * 2 * 2.54 / 4000
+//    val FORWARD_CM_PER_COUNT = PI * 2 * 2.54 / 4000
+//    val LATERAL_CM_PER_COUNT = PI * 2 * 2.54 / 4000
+
+    val FORWARD_CM_PER_COUNT = 0.00391354
+    val LATERAL_CM_PER_COUNT = 0.003845517
+
 //    val RAD_PER_COUNT = 13.75 * 2.54 / 4000
 //    val RAD_PER_COUNT = -1.099016 * 10.0.pow(-4)
 
-    val RAD_PER_COUNT = (2 * PI) / (-30112.75 - 29890.25)
+// correct
+//    val RAD_PER_COUNT = (2 * PI) / (-30112.75 - 29890.25)
 
 //    val RAD_PER_COUNT = -0.00029016892
 
@@ -23,7 +30,11 @@ class Odometer(leftDel: OptimizedMotor, rightDel: OptimizedMotor, lateralDel: Op
 //    val p = 2.0 * PI * sqrt((6.875.pow(2) + 6.5.pow(2))/2.0)
 //    val PREDICTED_LATERAL_CM_PER_RAD = -(13.75* PI / 2 * PI) * (p / 13.75 * PI)
 //    val PREDICTED_LATERAL_CM_PER_RAD = -3995.744 * LATERAL_CM_PER_COUNT
-    val PREDICTED_LATERAL_CM_PER_RAD = (8057.25 * LATERAL_CM_PER_COUNT) / (2 * PI)
+//    val PREDICTED_LATERAL_CM_PER_RAD = (8057.25 * LATERAL_CM_PER_COUNT) / (2 * PI)
+
+//    val PREDICTED_LATERAL_CM_PER_RAD = (7.897858183 * LATERAL_CM_PER_COUNT) * (360.0 / (2 * PI))
+    val PREDICTED_LATERAL_CM_PER_RAD = 0.0
+
     val TIME_BETWEEN_SPEED_UPDATES = 25
 
     val leftDeadWheel : Encoder = Encoder(leftDel, true)
@@ -67,9 +78,10 @@ class Odometer(leftDel: OptimizedMotor, rightDel: OptimizedMotor, lateralDel: Op
 
     fun updatePosition() {
         // save current dead wheel encoder counts
-        val leftCurr = leftDeadWheel.counts
+        val leftCurr = -leftDeadWheel.counts
         val rightCurr = rightDeadWheel.counts
         val lateralCurr = lateralDeadWheel.counts
+        val angleCurr = toRadians(gyro.integratedZValue.toDouble())
         
         // change in encoder counts for each dead wheel
         val leftDeltaCounts = leftCurr - lastLeftCounts
@@ -82,14 +94,16 @@ class Odometer(leftDel: OptimizedMotor, rightDel: OptimizedMotor, lateralDel: Op
         val lateralDeltaActual = lateralDeltaCounts * LATERAL_CM_PER_COUNT
 
         // change in robot angle
-        val angleDelta = (leftDeltaCounts - rightDeltaCounts) * RAD_PER_COUNT
+//        val angleDelta = (leftDeltaCounts - rightDeltaCounts) * RAD_PER_COUNT
 
         // updating our absolute angle (need to use total counts traveled)
         val totalRightCounts = rightCurr - initialRightCounts
         val totalLeftCounts = leftCurr - initialLeftCounts
 
-        angle = wrapAngle(((totalLeftCounts - totalRightCounts) * RAD_PER_COUNT) +
+        angle = wrapAngle((angleCurr) +
                 lastResetAngle)
+
+        val angleDelta = (angle - lastAngle)
 
         val lateralPrediction = angleDelta * PREDICTED_LATERAL_CM_PER_RAD
 

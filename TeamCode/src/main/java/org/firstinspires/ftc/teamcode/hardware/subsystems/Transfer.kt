@@ -10,54 +10,30 @@ import org.openftc.revextensions2.ExpansionHubMotor
 import kotlin.math.abs
 
 class Transfer(hardwareMap: HardwareMap): Subsystem() {
-    // front up: 0, front down: 1
-    val FRONT_UP = 0.0
-    val FRONT_DOWN = 0.8
+    val PIVOT_REGULAR = 0.4635 // 1427
+    val PIVOT_LEFT = 0.7895 // // 2079
+    val PIVOT_RIGHT = 0.1555 // 811
 
-    val BACK_UP = 1.0
-    val BACK_DOWN = 0.0
+    val GRABBED = 0.0 // 500
+    val RELEASED = 0.307 // 1114
 
-    val FRONT_READY = FRONT_UP
-    val BACK_READY = 0.2
-    val FRONT_GRABBED = 0.80
-    val BACK_GRABBED = 0.1
-    val FRONT_RELEASED = 0.55
-    val BACK_RELEASED = BACK_UP
-    val PIVOT_REGULAR = 0.04
-    val PIVOT_PERPENDICULAR = 0.5
+    val CAP_HOLD = 0.803 // 2106
+    val CAP_RELEASE = 0.00 // 500
 
-    val FOUR_BAR_POWER = 1.0
-    val READY_POSITION = 0
-    val GRAB_POSITION = 180
-    val OUT_POSITION = 650
-    val CLEAR_POSITION = 470
-    val DECELERATION_INTERVAL = 400 // in encoder counts
+    val BAR_READY = 0.72 // 1925; 1917
+    val BAR_GRAB = 0.763 // 2022; 2026
+    val BAR_PEG_ALIGN = 0.4135 // 1366; 1327
+    val BAR_DOWN = 0.319 // 1063; 1138
 
-    val CAP_HOLD = 0.62
-    val CAP_RELEASE = 0.20
-
-    val fourBar = OptimizedMotor(hardwareMap.get("T.Fb") as ExpansionHubMotor, false)
-    override val motors = listOf(fourBar)
-
-    init {
-        fourBar.mode = DcMotor.RunMode.STOP_AND_RESET_ENCODER
-        fourBar.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
-        fourBar.zeroPowerBehavior = DcMotor.ZeroPowerBehavior.BRAKE
-    }
-
-    val backGrab = hardwareMap.get("T.B") as Servo
-    val frontGrab = hardwareMap.get("T.F") as Servo
+    val bar = hardwareMap.get("T.B") as Servo
+    val grab = hardwareMap.get("T.G") as Servo
     val pivot = hardwareMap.get("T.P") as Servo
     val capstone = hardwareMap.get("T.C") as Servo
 
     enum class GrabberState {
         READY_FOR_STONE,
         GRABBED,
-        PERPENDICULAR,
-        RELEASED,
-        RELEASED_PERP,
-        OUTSIDE_READY,
-        OUTSIDE_GRABBED
+        RELEASED
     }
 
     var grabberState = GrabberState.READY_FOR_STONE
@@ -66,138 +42,37 @@ class Transfer(hardwareMap: HardwareMap): Subsystem() {
         when (value) {
             GrabberState.READY_FOR_STONE -> {
                 pivot.position = PIVOT_REGULAR
-                backGrab.position = BACK_READY
-                frontGrab.position = FRONT_READY
+                grab.position = RELEASED
             }
             GrabberState.GRABBED -> {
                 pivot.position = PIVOT_REGULAR
-                backGrab.position = BACK_GRABBED
-                frontGrab.position = FRONT_GRABBED
-            }
-            GrabberState.PERPENDICULAR -> {
-                pivot.position = PIVOT_PERPENDICULAR
-                backGrab.position = BACK_GRABBED
-                frontGrab.position = FRONT_GRABBED
+                grab.position = GRABBED
             }
             GrabberState.RELEASED -> {
-                pivot.position = PIVOT_REGULAR
-                backGrab.position = BACK_RELEASED
-                frontGrab.position = FRONT_RELEASED
-            }
-            GrabberState.RELEASED_PERP -> {
-                pivot.position = PIVOT_PERPENDICULAR
-                backGrab.position = BACK_RELEASED
-                frontGrab.position = FRONT_RELEASED
-            }
-            GrabberState.OUTSIDE_READY -> {
-                pivot.position = PIVOT_REGULAR
-                backGrab.position = BACK_RELEASED
-                frontGrab.position = 0.75
-            }
-            GrabberState.OUTSIDE_GRABBED -> {
-                pivot.position = PIVOT_REGULAR
-                // TODO: Tune
-                backGrab.position = BACK_DOWN
-                frontGrab.position = FRONT_DOWN
+                grab.position = RELEASED
             }
         }
     }
 
     enum class FourBarPosition {
-        LONG_DOWN,
-        SHORT_UP,
-        LONG_UP,
         READY,
         GRAB,
-        OUT,
-        CLEAR_FOUNDATION
+        PEG_ALIGN,
+        DOWN
     }
 
-    var prev = FourBarPosition.READY
-
-    var fourBarPosition = FourBarPosition.LONG_DOWN
+    var fourBarPosition = FourBarPosition.READY
     set(value) {
         field = value
-        when (value) {
-            FourBarPosition.LONG_DOWN -> {
-                if (!running) {
-                    runFourBarFor(1100, -0.85)
-                }
-            }
-            FourBarPosition.LONG_UP -> {
-                if (!running) {
-                    runFourBarFor(1100, 0.85)
-                }
-            }
-            FourBarPosition.SHORT_UP -> {
-                if (!running) {
-                    runFourBarFor(200, 1.0)
-                }
-            }
+        bar.position = when (value) {
+            FourBarPosition.READY -> BAR_READY
+            FourBarPosition.GRAB -> BAR_GRAB
+            FourBarPosition.PEG_ALIGN -> BAR_PEG_ALIGN
+            FourBarPosition.DOWN -> BAR_DOWN
         }
-
-    }
-//    var prev = FourBarPosition.READY
-
-    var running = false
-    var startTime = 0L
-    var fourBarPower = 0.0
-    var time = 0L
-
-    fun runFourBarFor(time: Long, power: Double) {
-        running = true
-        startTime = System.currentTimeMillis()
-        this.time = time
-        fourBarPower = power
     }
 
     fun update() {
-        if (running) {
-            if (System.currentTimeMillis() - startTime >= time) {
-                fourBar.power = 0.0
-                running = false
-            } else {
-                fourBar.power = fourBarPower
-            }
-        }
-    }
 
-    var automatic = false
-
-    fun runFourBarTo(position: FourBarPosition): Boolean {
-        if (automatic) {
-            val error = when (position) {
-                FourBarPosition.READY -> READY_POSITION - fourBar.currentPosition
-                FourBarPosition.GRAB -> GRAB_POSITION - fourBar.currentPosition
-                FourBarPosition.OUT -> OUT_POSITION - fourBar.currentPosition
-                FourBarPosition.CLEAR_FOUNDATION -> CLEAR_POSITION - fourBar.currentPosition
-                else -> 0
-            }
-
-            val decelerationInterval: Int = when (position) {
-                FourBarPosition.OUT -> 300
-                FourBarPosition.READY -> {
-                    if (prev == FourBarPosition.OUT) {
-                        250
-                    } else {
-                        200
-                    }
-                }
-                FourBarPosition.GRAB -> {
-                    if (prev == FourBarPosition.READY) {
-                        50
-                    } else {
-                        150
-                    }
-                }
-                FourBarPosition.CLEAR_FOUNDATION -> 50
-                else -> 0
-            }
-
-            val power = error.toDouble() / decelerationInterval.toDouble()
-            fourBar.power = Range.clip(power, -FOUR_BAR_POWER, FOUR_BAR_POWER)
-            return abs(error) < 4
-        }
-        return true
     }
 }
