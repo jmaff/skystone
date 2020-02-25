@@ -7,6 +7,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.control.EnhancedGamepad
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Intake
 import org.firstinspires.ftc.teamcode.hardware.subsystems.Transfer
+import org.firstinspires.ftc.teamcode.motion.Point
+import org.firstinspires.ftc.teamcode.telemetry.DebugApplicationServer
 import kotlin.math.PI
 
 @TeleOp(name = "Red TeleOp")
@@ -27,7 +29,7 @@ class RedTeleOp: RobotOpMode() {
         gamer1 = EnhancedGamepad(gamepad1)
         gamer2 = EnhancedGamepad(gamepad2)
 
-        drivetrain.odometer.resetPosition(17 / 2 * 2.54, 17.75 / 2 * 2.54, PI / 2)
+        drivetrain.odometer.resetPosition(343.217, 96.282, Math.PI)
         transfer.fourBarPosition = Transfer.FourBarPosition.READY
         transfer.grabberState = Transfer.GrabberState.GRABBED
     }
@@ -36,6 +38,8 @@ class RedTeleOp: RobotOpMode() {
         super.loop()
         gamer1.update()
         gamer2.update()
+
+        DebugApplicationServer.logPoint(Point(drivetrain.odometer.xPosition, drivetrain.odometer.yPosition))
 
         // foundation: 1
         if (gamer1.A.pressed && !drivetrain.foundationDown) {

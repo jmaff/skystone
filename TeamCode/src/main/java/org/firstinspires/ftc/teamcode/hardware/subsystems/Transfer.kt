@@ -21,7 +21,7 @@ class Transfer(hardwareMap: HardwareMap): Subsystem() {
     val CAP_RELEASE = 0.00 // 500
 
     val BAR_READY = 0.72 // 1925; 1917
-    val BAR_GRAB = 0.763 // 2022; 2026
+    val BAR_GRAB = 0.80 // 2022; 2026
     val BAR_PEG_ALIGN = 0.4135 // 1366; 1327
     val BAR_DOWN = 0.319 // 1063; 1138
 

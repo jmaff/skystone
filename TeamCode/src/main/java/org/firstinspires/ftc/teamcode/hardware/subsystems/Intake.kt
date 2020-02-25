@@ -20,10 +20,10 @@ class Intake(hardwareMap: HardwareMap): Subsystem() {
                 motor.power = 0.0
             }
             State.IN -> {
-                motor.power = 1.0
+                motor.power = 0.85
             }
             State.OUT -> {
-                motor.power = -1.0
+                motor.power = -0.85
             }
         }
     }

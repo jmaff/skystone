@@ -45,11 +45,11 @@ class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
     set(value) {
         field = value
         if (value) {
-            leftFoundation.position = 0.62
-            rightFoundation.position = 1.0
+            leftFoundation.position = LEFT_DOWN
+            rightFoundation.position = RIGHT_DOWN
         } else {
-            leftFoundation.position = 0.8
-            rightFoundation.position = 0.69
+            leftFoundation.position = LEFT_UP
+            rightFoundation.position = RIGHT_UP
         }
     }
 
