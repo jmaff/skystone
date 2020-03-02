@@ -76,27 +76,27 @@ class RedTeleOp: RobotOpMode() {
         // lift: 2
         if (gamer2.delegate.right_trigger > 0.0) {
             lift.power = -gamer2.delegate.right_trigger.toDouble()
-            liftRunning = true
+//            liftRunning = true
         } else if (gamer2.delegate.left_trigger > 0.0) {
             lift.power = gamer2.delegate.left_trigger.toDouble()
-            liftRunning = true
+//            liftRunning = true
         } else {
             lift.power = 0.0
-            liftRunning = false
-            lift.power = (target - lift.motor1.currentPosition) * p
+//            liftRunning = false
+//            lift.power = (target - lift.motor1.currentPosition) * p
         }
 
         // Capstone: 2
-        if (gamer2.A.state) {
+        if (gamer2.RIGHT_JOYSTICK_PUSH.pressed) {
             transfer.capstone.position = transfer.CAP_RELEASE
         }
 
         // Hold lift position
-        if (!liftRunning && prev) {
-            target = lift.motor1.currentPosition
-        }
-
-        prev = liftRunning
+//        if (!liftRunning && prev) {
+//            target = lift.motor1.currentPosition
+//        }
+//
+//        prev = liftRunning
 
         // Grabber: 2
         if (gamer2.A.pressed) {

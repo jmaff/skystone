@@ -10,8 +10,7 @@ import org.firstinspires.ftc.teamcode.motion.Waypoint
 import org.firstinspires.ftc.teamcode.motion.toRadians
 import org.firstinspires.ftc.teamcode.vision.SkystoneReader
 
-@Disabled
-@Autonomous(name = "Drop Intake")
+@Autonomous(name = "Deploy Intake")
 class DropIntake: Auto() {
     lateinit var stonePosition: SkystoneReader.StonePosition
     override fun init() {
@@ -41,8 +40,8 @@ class DropIntake: Auto() {
             // release intake
             0 -> {
 //                transfer.fourBarPosition = Transfer.FourBarPosition.READY
-                intake.state = Intake.State.OUT
-                if (stateTimeElapsed >= 500) {
+                intake.state = Intake.State.IN
+                if (stateTimeElapsed >= 5000) {
                     incrementState()
                 }
             }

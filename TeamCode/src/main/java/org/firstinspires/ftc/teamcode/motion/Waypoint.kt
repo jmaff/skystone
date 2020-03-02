@@ -10,6 +10,7 @@ class Waypoint(
         val slowDownAmount: Double = 0.2,
         val stop: Boolean = true
 ) {
+
     constructor(other: Waypoint) : this(other.x, other.y, other.movementPower, other.turnPower,
         other.followRadius, other.slowDownAngle, other.slowDownAmount, other.stop)
 
