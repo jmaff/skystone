@@ -14,16 +14,17 @@ class Transfer(hardwareMap: HardwareMap): Subsystem() {
     val PIVOT_LEFT = 0.7895 // // 2079
     val PIVOT_RIGHT = 0.1555 // 811
 
-    val GRABBED = 0.0 // 500
-    val RELEASED = 0.307 // 1114
+    val GRABBED = 0.638 // 500
+    val RELEASED = 1.00 // 1114
 
     val CAP_HOLD = 0.803 // 2106
-    val CAP_RELEASE = 0.00 // 500
+    val CAP_RELEASE = 0.2 // 500
 
     val BAR_READY = 0.72 // 1925; 1917
     val BAR_GRAB = 0.80 // 2022; 2026
     val BAR_PEG_ALIGN = 0.4135 // 1366; 1327
     val BAR_DOWN = 0.319 // 1063; 1138
+    val BAR_MAX_DOWN = 0.2
 
     val bar = hardwareMap.get("T.B") as Servo
     val grab = hardwareMap.get("T.G") as Servo
@@ -58,7 +59,8 @@ class Transfer(hardwareMap: HardwareMap): Subsystem() {
         READY,
         GRAB,
         PEG_ALIGN,
-        DOWN
+        DOWN,
+        MAX_DOWN
     }
 
     var fourBarPosition = FourBarPosition.READY
@@ -69,6 +71,7 @@ class Transfer(hardwareMap: HardwareMap): Subsystem() {
             FourBarPosition.GRAB -> BAR_GRAB
             FourBarPosition.PEG_ALIGN -> BAR_PEG_ALIGN
             FourBarPosition.DOWN -> BAR_DOWN
+            FourBarPosition.MAX_DOWN -> BAR_MAX_DOWN
         }
     }
 

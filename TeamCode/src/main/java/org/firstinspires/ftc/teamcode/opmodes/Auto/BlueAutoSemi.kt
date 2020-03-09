@@ -173,12 +173,16 @@ class BlueAutoSemi: Auto() {
 //                    transfer.fourBarPosition = Transfer.FourBarPosition.DOWN
 //                }
 
-                if (stateTimeElapsed < 1000) {
+                if (stateTimeElapsed > 600) {
                     transfer.grabberState = Transfer.GrabberState.RELEASED
                 }
 
-                if (stateTimeElapsed > 1400 && drivetrain.odometer.yPosition > 200.0) {
+                if (stateTimeElapsed > 700 && drivetrain.odometer.yPosition > 200.0) {
                     transfer.fourBarPosition = Transfer.FourBarPosition.GRAB
+                    if (drivetrain.stoneSensor.getDistance(DistanceUnit.CM) < 6.0) {
+                        goToState(8)
+                    }
+
                 }
 
                 if (drivetrain.odometer.yPosition < 250.0) {
@@ -199,7 +203,7 @@ class BlueAutoSemi: Auto() {
                         intake.state = Intake.State.OFF
                         incrementState()
                     }
-                } else if (stateTimeElapsed > 1000 && drivetrain.followPath(path, toRadians(90.0))) {
+                } else if (stateTimeElapsed > 600 && drivetrain.followPath(path, toRadians(90.0))) {
                     if (drivetrain.stoneSensor.getDistance(DistanceUnit.CM) < 6.0) {
                         incrementState()
                         intake.state = Intake.State.OFF
@@ -245,6 +249,9 @@ class BlueAutoSemi: Auto() {
                 intake.state = Intake.State.IN
                 if (stateTimeElapsed > 800 && !(drivetrain.odometer.yPosition < 150.0)) {
                     transfer.fourBarPosition = Transfer.FourBarPosition.GRAB
+                    if (drivetrain.stoneSensor.getDistance(DistanceUnit.CM) < 6.0) {
+                        goToState(8)
+                    }
                 }
 
                 val path = Path()
@@ -298,13 +305,16 @@ class BlueAutoSemi: Auto() {
 
                 if (drivetrain.followPath(path, toRadians(270.0))) {
                     incrementState()
-                    transfer.grabberState = Transfer.GrabberState.RELEASED
                 }
             }
             // park (if grabbed third stone)
             8 -> {
                 if (!missedThisStone) {
-                    if (stateTimeElapsed > 300) {
+                    if (stateTimeElapsed < 600) {
+                        transfer.grabberState = Transfer.GrabberState.RELEASED
+                    }
+
+                    if (stateTimeElapsed > 600) {
                         transfer.fourBarPosition = Transfer.FourBarPosition.GRAB
                     }
 
@@ -312,7 +322,7 @@ class BlueAutoSemi: Auto() {
                     path.addWaypoint(Waypoint(stateStartPosition.x, stateStartPosition.y, 0.0, 0.0, 0.0, 0.0, 0.0, true))
                     path.addWaypoint(Waypoint(365.76 - 285.0, 178.0, 0.7, 0.7))
 
-                    if (stateTimeElapsed > 400 && drivetrain.followPath(path, toRadians(90.0))) {
+                    if (stateTimeElapsed > 600 && drivetrain.followPath(path, toRadians(90.0))) {
                         goToState(404)
                     }
                 } else {

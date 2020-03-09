@@ -31,7 +31,7 @@ class RedTeleOp: RobotOpMode() {
 
         drivetrain.odometer.resetPosition(343.217, 96.282, Math.PI)
         transfer.fourBarPosition = Transfer.FourBarPosition.READY
-        transfer.grabberState = Transfer.GrabberState.GRABBED
+        transfer.grabberState = Transfer.GrabberState.RELEASED
     }
 
     override fun loop() {
@@ -70,7 +70,7 @@ class RedTeleOp: RobotOpMode() {
         if (!strafing) {
             drivetrain.xPower = gamepad1.left_stick_x.toDouble()
             drivetrain.yPower = -gamepad1.left_stick_y.toDouble()
-            drivetrain.turnPower = -gamepad1.right_stick_x.toDouble() * 0.7
+            drivetrain.turnPower = -gamepad1.right_stick_x.toDouble()
         }
 
         // lift: 2
@@ -104,11 +104,7 @@ class RedTeleOp: RobotOpMode() {
         }
 
         if (gamer2.Y.pressed) {
-            if (transfer.grabberState == Transfer.GrabberState.GRABBED) {
-                transfer.grabberState = Transfer.GrabberState.RELEASED
-            } else {
-                transfer.grabberState = Transfer.GrabberState.READY_FOR_STONE
-            }
+            transfer.grabberState = Transfer.GrabberState.RELEASED
         }
 
         // Pivot: 2
@@ -135,9 +131,10 @@ class RedTeleOp: RobotOpMode() {
         // Transfer: 2
         if (gamer2.DPAD_UP.pressed) {
             transfer.fourBarPosition = when (transfer.fourBarPosition) {
-                Transfer.FourBarPosition.GRAB ->  if (transfer.grab.position == transfer.GRABBED) Transfer.FourBarPosition.PEG_ALIGN else Transfer.FourBarPosition.READY
+                Transfer.FourBarPosition.GRAB ->  if (transfer.grabberState == Transfer.GrabberState.GRABBED) Transfer.FourBarPosition.PEG_ALIGN else Transfer.FourBarPosition.READY
                 Transfer.FourBarPosition.READY -> Transfer.FourBarPosition.PEG_ALIGN
                 Transfer.FourBarPosition.PEG_ALIGN -> Transfer.FourBarPosition.DOWN
+                Transfer.FourBarPosition.DOWN -> Transfer.FourBarPosition.MAX_DOWN
                 else -> transfer.fourBarPosition
             }
         }
@@ -147,6 +144,7 @@ class RedTeleOp: RobotOpMode() {
                 Transfer.FourBarPosition.READY ->  Transfer.FourBarPosition.GRAB
                 Transfer.FourBarPosition.PEG_ALIGN -> Transfer.FourBarPosition.READY
                 Transfer.FourBarPosition.DOWN -> Transfer.FourBarPosition.PEG_ALIGN
+                Transfer.FourBarPosition.MAX_DOWN -> Transfer.FourBarPosition.DOWN
                 else -> transfer.fourBarPosition
             }
         }

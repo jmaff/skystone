@@ -75,7 +75,7 @@ class RedAutoSemi: Auto() {
 
                 if (missedThisStone) {
                     drivetrain.yPower = 0.5
-                    if (drivetrain.odometer.xPosition < 215.0) {
+                    if (drivetrain.odometer.xPosition < 215.0 || drivetrain.stoneSensor.getDistance(DistanceUnit.CM) < 6.0) {
                         incrementState()
                     }
                 } else if (drivetrain.followPath(path, toRadians(90.0))) {
@@ -84,10 +84,10 @@ class RedAutoSemi: Auto() {
                     } else {
                         missedThisStone = true
                     }
-                }
-
-                if (drivetrain.stoneSensor.getDistance(DistanceUnit.CM) < 6.0) {
-                    incrementState()
+                } else {
+                    if (drivetrain.stoneSensor.getDistance(DistanceUnit.CM) < 6.0) {
+                        incrementState()
+                    }
                 }
             }
             // quarry to foundation
@@ -102,15 +102,15 @@ class RedAutoSemi: Auto() {
                 path.addWaypoint(Waypoint(stateStartPosition.x, stateStartPosition.y, 0.0, 0.0, 0.0, 0.0, 0.0, true))
                 when (stonePosition) {
                     SkystoneReader.StonePosition.CENTER -> {
-                        path.addWaypoint(Waypoint(280.0, 60.0, 0.7, 0.7))
+                        path.addWaypoint(Waypoint(286.0, 60.0, 0.7, 0.7))
                         path.addWaypoint(Waypoint(280.0, 70.0, 0.7, 0.7))
                     }
                     SkystoneReader.StonePosition.RIGHT -> {
-                        path.addWaypoint(Waypoint(280.0, 85.0, 0.7, 0.7))
+                        path.addWaypoint(Waypoint(286.0, 85.0, 0.7, 0.7))
                         path.addWaypoint(Waypoint(280.0, 110.0, 0.7, 0.7))
                     }
                     SkystoneReader.StonePosition.LEFT -> {
-                        path.addWaypoint(Waypoint(280.0, 40.0, 0.7, 0.7))
+                        path.addWaypoint(Waypoint(286.0, 40.0, 0.7, 0.7))
                         path.addWaypoint(Waypoint(280.0, 110.0, 0.7, 0.7))
                     }
                 }
@@ -146,9 +146,9 @@ class RedAutoSemi: Auto() {
                 path.addWaypoint(Waypoint(stateStartPosition.x, stateStartPosition.y, 0.0, 0.0, 0.0, 0.0, 0.0, true))
                 path.addWaypoint(Waypoint(250.0, 290.0, 0.9, 0.9))
                 path.addWaypoint(Waypoint(270.0, 280.0, 0.9, 0.9))
-                path.addWaypoint(Waypoint(280.0, 260.0, 0.9, 0.9))
-                path.addWaypoint(Waypoint(280.0, 175.0, 0.7, 0.7))
-                path.addWaypoint(Waypoint(280.0, 140.0, 0.7, 0.7))
+                path.addWaypoint(Waypoint(275.0, 260.0, 0.9, 0.9))
+                path.addWaypoint(Waypoint(275.0, 175.0, 0.7, 0.7))
+                path.addWaypoint(Waypoint(275.0, 140.0, 0.7, 0.7))
 
                 when (stonePosition) {
                     SkystoneReader.StonePosition.CENTER -> {
@@ -172,12 +172,15 @@ class RedAutoSemi: Auto() {
 //                    transfer.fourBarPosition = Transfer.FourBarPosition.PEG_ALIGN
 //                }
 
-                if (stateTimeElapsed < 1000) {
+                if (stateTimeElapsed > 600) {
                     transfer.grabberState = Transfer.GrabberState.RELEASED
                 }
 
-                if (stateTimeElapsed > 1400 && drivetrain.odometer.yPosition > 200.0) {
+                if (stateTimeElapsed > 700 && drivetrain.odometer.yPosition > 200.0) {
                     transfer.fourBarPosition = Transfer.FourBarPosition.GRAB
+                    if (drivetrain.stoneSensor.getDistance(DistanceUnit.CM) < 6.0) {
+                        goToState(8)
+                    }
                 }
 
                 if (drivetrain.odometer.yPosition < 250.0) {
@@ -217,10 +220,10 @@ class RedAutoSemi: Auto() {
 
                 val path = Path()
                 path.addWaypoint(Waypoint(stateStartPosition.x, stateStartPosition.y, 0.0, 0.0, 0.0, 0.0, 0.0, true))
-                path.addWaypoint(Waypoint(280.0, 110.0, 0.7, 0.7))
-                path.addWaypoint(Waypoint(280.0, 175.0, 0.7, 0.7))
-                path.addWaypoint(Waypoint(280.0, 260.0, 0.7, 0.7))
-                path.addWaypoint(Waypoint(280.0, 300.0, 0.7, 0.7))
+                path.addWaypoint(Waypoint(275.0, 110.0, 0.7, 0.7))
+                path.addWaypoint(Waypoint(275.0, 175.0, 0.7, 0.7))
+                path.addWaypoint(Waypoint(275.0, 260.0, 0.7, 0.7))
+                path.addWaypoint(Waypoint(275.0, 300.0, 0.7, 0.7))
 
                 if (drivetrain.odometer.yPosition > 115.0) {
                     intake.state = Intake.State.IN
@@ -244,11 +247,14 @@ class RedAutoSemi: Auto() {
                 intake.state = Intake.State.IN
                 if (stateTimeElapsed > 800 && !(drivetrain.odometer.yPosition < 150.0)) {
                     transfer.fourBarPosition = Transfer.FourBarPosition.GRAB
+                    if (drivetrain.stoneSensor.getDistance(DistanceUnit.CM) < 6.0) {
+                        goToState(8)
+                    }
                 }
 
                 val path = Path()
                 path.addWaypoint(Waypoint(stateStartPosition.x, stateStartPosition.y, 0.0, 0.0, 0.0, 0.0, 0.0, true))
-                path.addWaypoint(Waypoint(280.0, 148.0, 0.7, 0.7))
+                path.addWaypoint(Waypoint(275.0, 148.0, 0.7, 0.7))
                 path.addWaypoint(Waypoint(220.0, 111.0, 0.7, 0.7))
                 path.addWaypoint(Waypoint(220.0, 34.0, 0.7, 0.7))
 
@@ -278,12 +284,12 @@ class RedAutoSemi: Auto() {
 
                 val path = Path()
                 path.addWaypoint(Waypoint(stateStartPosition.x, stateStartPosition.y, 0.0, 0.0, 0.0, 0.0, 0.0, true))
-                path.addWaypoint(Waypoint(280.0, 110.0, 0.7, 0.7))
-                path.addWaypoint(Waypoint(280.0, 175.0, 0.7, 0.7))
+                path.addWaypoint(Waypoint(275.0, 110.0, 0.7, 0.7))
+                path.addWaypoint(Waypoint(275.0, 175.0, 0.7, 0.7))
 
                 if (!missedThisStone) {
-                    path.addWaypoint(Waypoint(280.0, 260.0, 0.7, 0.7))
-                    path.addWaypoint(Waypoint(280.0, 300.0, 0.7, 0.7))
+                    path.addWaypoint(Waypoint(275.0, 260.0, 0.7, 0.7))
+                    path.addWaypoint(Waypoint(275.0, 300.0, 0.7, 0.7))
 
 
                     if (drivetrain.odometer.yPosition > 200.0) {
@@ -297,21 +303,24 @@ class RedAutoSemi: Auto() {
 
                 if (drivetrain.followPath(path, toRadians(270.0))) {
                     incrementState()
-                    transfer.grabberState = Transfer.GrabberState.RELEASED
                 }
             }
             // park (if grabbed third stone)
             8 -> {
                 if (!missedThisStone) {
-                    if (stateTimeElapsed > 300) {
+                    if (stateTimeElapsed < 600) {
+                        transfer.grabberState = Transfer.GrabberState.RELEASED
+                    }
+
+                    if (stateTimeElapsed > 600) {
                         transfer.fourBarPosition = Transfer.FourBarPosition.GRAB
                     }
 
                     val path = Path()
                     path.addWaypoint(Waypoint(stateStartPosition.x, stateStartPosition.y, 0.0, 0.0, 0.0, 0.0, 0.0, true))
-                    path.addWaypoint(Waypoint(275.0, 178.0, 0.7, 0.7))
+                    path.addWaypoint(Waypoint(274.0, 178.0, 0.7, 0.7))
 
-                    if (drivetrain.followPath(path, toRadians(90.0))) {
+                    if (stateTimeElapsed > 600 && drivetrain.followPath(path, toRadians(90.0))) {
                         goToState(404)
                     }
                 } else {
