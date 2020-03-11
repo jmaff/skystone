@@ -9,7 +9,10 @@ import org.firstinspires.ftc.teamcode.hardware.devices.OptimizedMotor
 import org.openftc.revextensions2.ExpansionHubMotor
 import kotlin.math.abs
 
-class Transfer(hardwareMap: HardwareMap): Subsystem() {
+class Transfer(hardwareMap: HardwareMap): Subsystem {
+    override var lastUpdateTime = 0L
+    override val motors: List<OptimizedMotor> = listOf()
+
     val PIVOT_REGULAR = 0.4635 // 1427
     val PIVOT_LEFT = 0.7895 // // 2079
     val PIVOT_RIGHT = 0.1555 // 811

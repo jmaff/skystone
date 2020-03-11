@@ -11,7 +11,8 @@ import org.openftc.revextensions2.ExpansionHubMotor
 import java.text.FieldPosition
 import kotlin.math.*
 
-class Drivetrain(hardwareMap: HardwareMap) : Subsystem() {
+class Drivetrain(hardwareMap: HardwareMap) : Subsystem {
+    override var lastUpdateTime = 0L
     val MIN_MOTOR_POWER = 0.11
 //    val Y_SLIP_PER_CM_PER_SEC = 0.100412
 //    val X_SLIP_PER_CM_PER_SEC = 0.076687

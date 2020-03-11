@@ -8,7 +8,8 @@ import org.firstinspires.ftc.teamcode.hardware.devices.OptimizedMotor
 import org.openftc.revextensions2.ExpansionHubMotor
 import java.time.OffsetDateTime
 
-class Intake(hardwareMap: HardwareMap): Subsystem() {
+class Intake(hardwareMap: HardwareMap): Subsystem {
+    override var lastUpdateTime = 0L
     val motor: OptimizedMotor = OptimizedMotor(hardwareMap.get("I.M") as ExpansionHubMotor, false)
     override val motors: List<OptimizedMotor> = listOf(motor)
 

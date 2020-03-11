@@ -2,12 +2,16 @@ package org.firstinspires.ftc.teamcode.hardware.subsystems
 
 import com.qualcomm.robotcore.hardware.HardwareMap
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName
+import org.firstinspires.ftc.teamcode.hardware.devices.OptimizedMotor
 import org.firstinspires.ftc.teamcode.vision.SkystoneReader
 import org.openftc.easyopencv.OpenCvCamera
 import org.openftc.easyopencv.OpenCvCameraRotation
 import org.openftc.easyopencv.OpenCvWebcam
 
-class Vision(hardwareMap: HardwareMap): Subsystem() {
+class Vision(hardwareMap: HardwareMap): Subsystem {
+    override var lastUpdateTime = 0L
+    override val motors: List<OptimizedMotor> = listOf()
+
     val camera: OpenCvCamera
     val skystoneReader = SkystoneReader()
 
